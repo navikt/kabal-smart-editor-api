@@ -1,0 +1,4 @@
+ingresses:
+  - https://kabal-smart-editor-api.intern.nav.no
+externalHosts:
+springProfile: prod-gcp

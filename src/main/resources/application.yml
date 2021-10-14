@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: kabal-smart-editor-api
+  main:
+    banner-mode: OFF
+  sleuth:
+    baggage:
+      remote-fields:
+        - Nav-Callid
+        - Nav-Consumer-Id
+      correlation-fields:
+        - Nav-Callid
+        - Nav-Consumer-Id
+  mvc:
+    throw-exception-if-no-handler-found: true
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+  servlet:
+    multipart:
+      #  Size limitations are also handled by app itself to get nice fault messages, but this setting seems to fail faster?
+      max-request-size: 8MB
+      max-file-size: 8MB
+  codec:
+    max-in-memory-size: 16MB
+
+server:
+  port: 7095
+  error:
+    whitelabel:
+      enabled: false
+  shutdown: graceful
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints.web:
+    exposure:
+      include: info, health, metrics, prometheus
+    base-path: "/internal"
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+
+
+navCallId: Nav-Callid
+navConsumerId: Nav-Consumer-Id
+
