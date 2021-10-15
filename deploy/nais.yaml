@@ -9,7 +9,23 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: "100M"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
 spec:
-  image: {{ image }}
+  image: {{image}}
+  gcp:
+    sqlInstances:
+      - name: kabal-api
+        type: POSTGRES_12
+        maintenanceWindow:
+          day: 1
+          hour: 3
+        tier: {{db_tier}}
+        diskType: SSD
+        highAvailability: {{db_ha}}
+        diskSize: {{db_size}}
+        diskAutoresize: true
+        autoBackupTime: "02:00"
+        cascadingDelete: false
+        databases:
+          - name: kabal-smart-editor-api
   port: 7095
   startup:
     failureThreshold: 20
@@ -30,13 +46,13 @@ spec:
   resources:
     limits:
       cpu: 2000m
-      memory: 2048Mi
+      memory: 1024Mi
     requests:
       cpu: 400m
       memory: 256Mi
   ingresses:
-  {{#each ingresses as |ingress|}}
-    - {{ingress}}
+  { { #each ingresses as |ingress|}}
+      - {{ingress } }
   {{/each}}
   replicas:
     min: 2
@@ -54,3 +70,5 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: {{springProfile}}
+    - name: JAVA_OPTS
+      value: "-Xms256m -Xmx1024m"
