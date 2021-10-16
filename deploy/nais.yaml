@@ -12,7 +12,6 @@ spec:
   image: {{image}}
   gcp:
     sqlInstances:
-      - name: kabal-api
         type: POSTGRES_12
         maintenanceWindow:
           day: 1
