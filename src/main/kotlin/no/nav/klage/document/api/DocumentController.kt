@@ -28,7 +28,7 @@ class DocumentController(
         value = "Create document",
         notes = "Create document"
     )
-    @PostMapping("/")
+    @PostMapping("")
     fun createDocument(
         @RequestBody json: String
     ): DocumentView {
