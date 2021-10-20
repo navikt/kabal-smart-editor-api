@@ -1,5 +1,6 @@
 package no.nav.klage.document.api
 
+import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import no.nav.klage.document.api.views.CommentInput
 import no.nav.klage.document.api.views.CommentView
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
+@Api(tags = ["kabal-smart-editor-api"])
 @RequestMapping("/documents")
 class DocumentController(
     private val documentService: DocumentService,
