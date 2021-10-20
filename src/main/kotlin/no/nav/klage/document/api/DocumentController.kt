@@ -82,7 +82,7 @@ class DocumentController(
         value = "Reply to a given comment",
         notes = "Reply to a given comment"
     )
-    @PostMapping("/{documentId}/comments/{commentId}")
+    @PostMapping("/{documentId}/comments/{commentId}/replies")
     fun replyToComment(
         @PathVariable("documentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID,
