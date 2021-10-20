@@ -4,6 +4,7 @@ val mockkVersion = "1.12.0"
 val logstashVersion = "6.6"
 val springVersion = "2.5.5"
 val testContainersVersion = "1.16.0"
+val springFoxVersion = "3.0.0"
 
 repositories {
     mavenCentral()
@@ -26,6 +27,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+    implementation("io.springfox:springfox-boot-starter:$springFoxVersion")
 
     implementation("org.flywaydb:flyway-core")
     implementation("com.zaxxer:HikariCP")

@@ -1,5 +1,6 @@
 package no.nav.klage.document.api
 
+import io.swagger.annotations.ApiOperation
 import no.nav.klage.document.api.views.CommentInput
 import no.nav.klage.document.api.views.CommentView
 import no.nav.klage.document.api.views.DocumentView
@@ -23,6 +24,10 @@ class DocumentController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
+    @ApiOperation(
+        value = "Create document",
+        notes = "Create document"
+    )
     @PostMapping("/")
     fun createDocument(
         @RequestBody json: String
@@ -31,12 +36,20 @@ class DocumentController(
         return mapToDocumentView(documentService.createDocument(json))
     }
 
+    @ApiOperation(
+        value = "Get document",
+        notes = "Get document"
+    )
     @GetMapping("/{documentId}")
     fun getDocument(@PathVariable("documentId") documentId: UUID): DocumentView {
         logger.debug("getDocument")
         return mapToDocumentView(documentService.getDocument(documentId))
     }
 
+    @ApiOperation(
+        value = "Create comment for a given document",
+        notes = "Create comment for a given document"
+    )
     @PostMapping("/{documentId}/comments")
     fun createComment(
         @PathVariable("documentId") documentId: UUID,
@@ -53,6 +66,10 @@ class DocumentController(
         )
     }
 
+    @ApiOperation(
+        value = "Get all comments for a given document",
+        notes = "Get all comments for a given document"
+    )
     @GetMapping("/{documentId}/comments")
     fun getAllCommentsWithPossibleThreads(
         @PathVariable("documentId") documentId: UUID
@@ -61,6 +78,10 @@ class DocumentController(
         return commentService.getComments(documentId).map { mapCommentToView(it) }
     }
 
+    @ApiOperation(
+        value = "Reply to a given comment",
+        notes = "Reply to a given comment"
+    )
     @PostMapping("/{documentId}/comments/{commentId}")
     fun replyToComment(
         @PathVariable("documentId") documentId: UUID,
@@ -79,6 +100,10 @@ class DocumentController(
         )
     }
 
+    @ApiOperation(
+        value = "Get a given comment",
+        notes = "Get a given comment"
+    )
     @GetMapping("/{documentId}/comments/{commentId}")
     fun getCommentWithPossibleThread(
         @PathVariable("documentId") documentId: UUID,
