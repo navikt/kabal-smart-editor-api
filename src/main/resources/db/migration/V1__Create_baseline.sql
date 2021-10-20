@@ -16,8 +16,19 @@ $$;
 
 CREATE TABLE klage.document
 (
-    id             UUID PRIMARY KEY,
-    json           TEXT      NOT NULL,
-    created        TIMESTAMP NOT NULL,
-    modified       TIMESTAMP NOT NULL
+    id       UUID PRIMARY KEY,
+    json     TEXT      NOT NULL,
+    created  TIMESTAMP NOT NULL,
+    modified TIMESTAMP NOT NULL
 );
+
+CREATE TABLE klage.document_comment
+(
+    id          UUID PRIMARY KEY,
+    document_id UUID REFERENCES klage.document (id),
+    text        TEXT      NOT NULL,
+    created     TIMESTAMP NOT NULL,
+    modified    TIMESTAMP NOT NULL
+);
+
+CREATE INDEX document_comment_ix ON klage.document_comment (document_id);

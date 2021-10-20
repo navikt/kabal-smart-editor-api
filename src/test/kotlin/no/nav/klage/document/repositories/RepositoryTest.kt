@@ -1,5 +1,6 @@
 package no.nav.klage.document.repositories
 
+import no.nav.klage.document.domain.Comment
 import no.nav.klage.document.domain.Document
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -16,7 +17,7 @@ import java.time.LocalDateTime
 @DataJpaTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class DocumentRepositoryTest {
+class RepositoryTest {
 
     companion object {
         @Container
@@ -30,8 +31,11 @@ class DocumentRepositoryTest {
     @Autowired
     lateinit var documentRepository: DocumentRepository
 
+    @Autowired
+    lateinit var commentRepository: CommentRepository
+
     @Test
-    fun `add documents works`() {
+    fun `add document and comments work`() {
 
         val now = LocalDateTime.now()
 
@@ -48,6 +52,30 @@ class DocumentRepositoryTest {
 
         val foundDocument = documentRepository.findById(document.id).get()
         assertThat(foundDocument).isEqualTo(document)
+
+        val comment1 = Comment(
+            documentId = document.id,
+            text = "my comment 1",
+            created = now.plusDays(1),
+            modified = now.plusDays(1)
+        )
+
+        val comment2 = Comment(
+            documentId = document.id,
+            text = "my comment 2",
+            created = now.plusDays(2),
+            modified = now.plusDays(2)
+        )
+
+        commentRepository.save(comment1)
+        commentRepository.save(comment2)
+
+        testEntityManager.flush()
+        testEntityManager.clear()
+
+        val comments = commentRepository.findByDocumentId(document.id)
+
+        assertThat(comments).hasSize(2)
     }
 
 }

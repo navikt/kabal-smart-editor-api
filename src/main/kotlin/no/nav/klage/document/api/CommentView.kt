@@ -3,9 +3,9 @@ package no.nav.klage.document.api
 import java.time.LocalDateTime
 import java.util.*
 
-data class DocumentView(
+data class CommentView(
     val id: UUID,
-    val json: String,
+    val text: String,
     val created: LocalDateTime,
     val modified: LocalDateTime
 )
