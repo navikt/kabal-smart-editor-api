@@ -51,7 +51,7 @@ spec:
       memory: 256Mi
   ingresses:
   {{#each ingresses as |ingress|}}
-      - {{ingress }}
+    - {{ingress}}
   {{/each}}
   replicas:
     min: 2
