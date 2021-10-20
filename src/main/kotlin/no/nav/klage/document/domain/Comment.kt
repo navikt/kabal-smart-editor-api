@@ -1,21 +1,32 @@
 package no.nav.klage.document.domain
 
+import org.hibernate.annotations.BatchSize
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
-@Table(name = "document_comment", schema = "klage")
+@Table(name = "comment", schema = "klage")
 class Comment(
     @Id
     val id: UUID = UUID.randomUUID(),
+    @Column(name = "parent_comment_id")
+    var parentCommentId: UUID? = null,
     @Column(name = "document_id")
     var documentId: UUID,
     @Column(name = "text")
     var text: String,
+    @Column(name = "author_name")
+    var authorName: String,
+    @Column(name = "author_ident")
+    var authorIdent: String,
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "parent_comment_id", referencedColumnName = "id")
+    @Fetch(FetchMode.SELECT)
+    @BatchSize(size = 100)
+    val comments: MutableSet<Comment> = mutableSetOf(),
     @Column(name = "created")
     val created: LocalDateTime,
     @Column(name = "modified")

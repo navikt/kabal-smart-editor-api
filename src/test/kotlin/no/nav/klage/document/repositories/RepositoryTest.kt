@@ -56,13 +56,18 @@ class RepositoryTest {
         val comment1 = Comment(
             documentId = document.id,
             text = "my comment 1",
+            authorName = "Kalle Anka",
+            authorIdent = "Z123456",
             created = now.plusDays(1),
             modified = now.plusDays(1)
         )
 
         val comment2 = Comment(
             documentId = document.id,
-            text = "my comment 2",
+            parentCommentId = comment1.id,
+            text = "my sub comment 2",
+            authorName = "Kajsa Anka",
+            authorIdent = "Z654321",
             created = now.plusDays(2),
             modified = now.plusDays(2)
         )
@@ -73,9 +78,9 @@ class RepositoryTest {
         testEntityManager.flush()
         testEntityManager.clear()
 
-        val comments = commentRepository.findByDocumentId(document.id)
+        val comments = commentRepository.findByDocumentIdAndParentCommentIdIsNull(document.id)
 
-        assertThat(comments).hasSize(2)
+        assertThat(comments.first().comments).hasSize(1)
     }
 
 }
