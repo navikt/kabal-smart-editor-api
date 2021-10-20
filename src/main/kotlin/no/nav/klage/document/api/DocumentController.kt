@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
+@RequestMapping("/documents")
 class DocumentController(
     private val documentService: DocumentService,
     private val commentService: CommentService
@@ -22,7 +23,7 @@ class DocumentController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @PostMapping("/documents")
+    @PostMapping("/")
     fun createDocument(
         @RequestBody json: String
     ): DocumentView {
@@ -30,13 +31,13 @@ class DocumentController(
         return mapToDocumentView(documentService.createDocument(json))
     }
 
-    @GetMapping("/documents/{documentId}")
+    @GetMapping("/{documentId}")
     fun getDocument(@PathVariable("documentId") documentId: UUID): DocumentView {
         logger.debug("getDocument")
         return mapToDocumentView(documentService.getDocument(documentId))
     }
 
-    @PostMapping("/documents/{documentId}/comments")
+    @PostMapping("/{documentId}/comments")
     fun createComment(
         @PathVariable("documentId") documentId: UUID,
         @RequestBody commentInput: CommentInput
@@ -52,7 +53,7 @@ class DocumentController(
         )
     }
 
-    @GetMapping("/documents/{documentId}/comments")
+    @GetMapping("/{documentId}/comments")
     fun getAllCommentsWithPossibleThreads(
         @PathVariable("documentId") documentId: UUID
     ): List<CommentView> {
@@ -60,7 +61,7 @@ class DocumentController(
         return commentService.getComments(documentId).map { mapCommentToView(it) }
     }
 
-    @PostMapping("/documents/{documentId}/comments/{commentId}")
+    @PostMapping("/{documentId}/comments/{commentId}")
     fun replyToComment(
         @PathVariable("documentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID,
@@ -78,7 +79,7 @@ class DocumentController(
         )
     }
 
-    @GetMapping("/documents/{documentId}/comments/{commentId}")
+    @GetMapping("/{documentId}/comments/{commentId}")
     fun getCommentWithPossibleThread(
         @PathVariable("documentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID
