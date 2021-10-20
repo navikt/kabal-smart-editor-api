@@ -1,4 +1,4 @@
-package no.nav.klage.document.api
+package no.nav.klage.document.api.views
 
 data class CommentInput(
     val text: String,

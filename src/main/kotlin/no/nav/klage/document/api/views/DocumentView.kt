@@ -1,4 +1,4 @@
-package no.nav.klage.document.api
+package no.nav.klage.document.api.views
 
 import java.time.LocalDateTime
 import java.util.*

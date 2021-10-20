@@ -1,5 +1,8 @@
 package no.nav.klage.document.api
 
+import no.nav.klage.document.api.views.CommentInput
+import no.nav.klage.document.api.views.CommentView
+import no.nav.klage.document.api.views.DocumentView
 import no.nav.klage.document.domain.Comment
 import no.nav.klage.document.domain.Document
 import no.nav.klage.document.service.CommentService
