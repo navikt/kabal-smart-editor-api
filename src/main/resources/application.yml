@@ -60,3 +60,7 @@ management:
 navCallId: Nav-Callid
 navConsumerId: Nav-Consumer-Id
 
+allowed.origins:
+  https://kabal.intern.nav.no,
+  https://kabal.dev.nav.no
+
