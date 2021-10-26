@@ -39,6 +39,19 @@ class DocumentController(
     }
 
     @ApiOperation(
+        value = "Update document",
+        notes = "Update document"
+    )
+    @PutMapping("/{documentId}")
+    fun updateDocument(
+        @PathVariable("documentId") documentId: UUID,
+        @RequestBody json: String
+    ): DocumentView {
+        logger.debug("updateDocument: received json: {}", json)
+        return mapToDocumentView(documentService.updateDocument(documentId, json))
+    }
+
+    @ApiOperation(
         value = "Get document",
         notes = "Get document"
     )

@@ -22,6 +22,13 @@ class DocumentService(private val documentRepository: DocumentRepository) {
         )
     }
 
+    fun updateDocument(documentId: UUID, json: String): Document {
+        val document = documentRepository.getById(documentId)
+        document.json = json
+        document.modified = LocalDateTime.now()
+        return document
+    }
+
     fun getDocument(documentId: UUID): Document {
         return documentRepository.getById(documentId)
     }
