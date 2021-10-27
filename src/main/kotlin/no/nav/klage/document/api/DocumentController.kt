@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
-@CrossOrigin
 @Api(tags = ["kabal-smart-editor-api"])
 @RequestMapping("/documents")
 class DocumentController(
@@ -32,6 +31,7 @@ class DocumentController(
         notes = "Create document"
     )
     @PostMapping("")
+    @CrossOrigin
     fun createDocument(
         @RequestBody json: String
     ): DocumentView {
@@ -44,6 +44,7 @@ class DocumentController(
         notes = "Update document"
     )
     @PutMapping("/{documentId}")
+    @CrossOrigin
     fun updateDocument(
         @PathVariable("documentId") documentId: UUID,
         @RequestBody json: String
@@ -57,6 +58,7 @@ class DocumentController(
         notes = "Get document"
     )
     @GetMapping("/{documentId}")
+    @CrossOrigin
     fun getDocument(@PathVariable("documentId") documentId: UUID): DocumentView {
         logger.debug("getDocument")
         return mapToDocumentView(documentService.getDocument(documentId))
@@ -67,6 +69,7 @@ class DocumentController(
         notes = "Create comment for a given document"
     )
     @PostMapping("/{documentId}/comments")
+    @CrossOrigin
     fun createComment(
         @PathVariable("documentId") documentId: UUID,
         @RequestBody commentInput: CommentInput
@@ -87,6 +90,7 @@ class DocumentController(
         notes = "Get all comments for a given document"
     )
     @GetMapping("/{documentId}/comments")
+    @CrossOrigin
     fun getAllCommentsWithPossibleThreads(
         @PathVariable("documentId") documentId: UUID
     ): List<CommentView> {
@@ -99,6 +103,7 @@ class DocumentController(
         notes = "Reply to a given comment"
     )
     @PostMapping("/{documentId}/comments/{commentId}/replies")
+    @CrossOrigin
     fun replyToComment(
         @PathVariable("documentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID,
@@ -121,6 +126,7 @@ class DocumentController(
         notes = "Get a given comment"
     )
     @GetMapping("/{documentId}/comments/{commentId}")
+    @CrossOrigin
     fun getCommentWithPossibleThread(
         @PathVariable("documentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID
