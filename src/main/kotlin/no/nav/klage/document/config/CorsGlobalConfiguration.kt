@@ -36,7 +36,7 @@ class CorsGlobalConfiguration {
     }
 
     private fun corsConfiguration(): CorsConfiguration {
-        val config = CorsConfiguration()
+        val config = CorsConfiguration().applyPermitDefaultValues()
         config.allowedOrigins = allowedOrigins
         config.addAllowedMethod("*")
         config.allowCredentials = true
