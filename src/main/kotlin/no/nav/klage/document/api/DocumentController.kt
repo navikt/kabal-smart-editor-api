@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
-@CrossOrigin(methods = [RequestMethod.GET, RequestMethod.DELETE, RequestMethod.HEAD, RequestMethod.POST, RequestMethod.OPTIONS, RequestMethod.PUT])
+//@CrossOrigin(methods = [RequestMethod.GET, RequestMethod.DELETE, RequestMethod.HEAD, RequestMethod.POST, RequestMethod.OPTIONS, RequestMethod.PUT])
 @Api(tags = ["kabal-smart-editor-api"])
 @RequestMapping("/documents")
 class DocumentController(
