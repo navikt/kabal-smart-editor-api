@@ -2,6 +2,7 @@ package no.nav.klage.document.api
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
 import no.nav.klage.document.api.views.CommentInput
 import no.nav.klage.document.api.views.CommentView
 import no.nav.klage.document.api.views.DocumentView
@@ -10,6 +11,10 @@ import no.nav.klage.document.domain.Document
 import no.nav.klage.document.service.CommentService
 import no.nav.klage.document.service.DocumentService
 import no.nav.klage.document.util.getLogger
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -126,6 +131,29 @@ class DocumentController(
     ): CommentView {
         logger.debug("getCommentWithPossibleThread")
         return mapCommentToView(commentService.getComment(commentId = commentId))
+    }
+
+    @ApiOperation(
+        value = "Generer PDF",
+        notes = "Generer PDF"
+    )
+    @ResponseBody
+    @GetMapping("/{documentId}/pdf")
+    fun getDocumentAsPDF(
+        @PathVariable("documentId") documentId: UUID
+    ): ResponseEntity<ByteArray> {
+        logger.debug("getDocumentAsPDF with id {}", documentId)
+
+        val pdfDocument = documentService.getDocumentAsPDF(documentId)
+
+        val responseHeaders = HttpHeaders()
+        responseHeaders.contentType = MediaType.APPLICATION_PDF
+        responseHeaders.add("Content-Disposition", "inline; filename=${pdfDocument.filename}.pdf")
+        return ResponseEntity(
+            pdfDocument.bytes,
+            responseHeaders,
+            HttpStatus.OK
+        )
     }
 
     private fun mapToDocumentView(document: Document): DocumentView =

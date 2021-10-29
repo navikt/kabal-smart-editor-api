@@ -66,6 +66,9 @@ spec:
     inbound:
       rules:
         - application: kabal-frontend
+    outbound:
+      rules:
+        - application: kabal-json-to-pdf
   azure:
     application:
       enabled: true
