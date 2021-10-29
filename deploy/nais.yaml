@@ -65,7 +65,11 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: kabal-api
+        - application: kabal-frontend
+  azure:
+    application:
+      enabled: true
+      tenant: {{tenant}}
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: {{springProfile}}
