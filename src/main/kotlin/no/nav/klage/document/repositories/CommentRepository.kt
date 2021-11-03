@@ -9,6 +9,6 @@ interface CommentRepository : JpaRepository<Comment, UUID> {
     /**
      * Only find parent comments
      */
-    fun findByDocumentIdAndParentCommentIdIsNull(documentId: UUID): List<Comment>
+    fun findByDocumentIdAndParentCommentIdIsNullOrderByCreatedAsc(documentId: UUID): List<Comment>
 
 }

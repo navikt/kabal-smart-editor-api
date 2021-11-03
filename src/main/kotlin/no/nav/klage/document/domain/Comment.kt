@@ -26,6 +26,7 @@ class Comment(
     @JoinColumn(name = "parent_comment_id", referencedColumnName = "id")
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 100)
+    @OrderBy("created asc")
     val comments: MutableSet<Comment> = mutableSetOf(),
     @Column(name = "created")
     val created: LocalDateTime,

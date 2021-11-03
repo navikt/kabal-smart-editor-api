@@ -47,7 +47,7 @@ class CommentService(private val commentRepository: CommentRepository) {
     }
 
     fun getComments(documentId: UUID): List<Comment> {
-        return commentRepository.findByDocumentIdAndParentCommentIdIsNull(documentId)
+        return commentRepository.findByDocumentIdAndParentCommentIdIsNullOrderByCreatedAsc(documentId)
     }
 
     fun getComment(commentId: UUID): Comment {
