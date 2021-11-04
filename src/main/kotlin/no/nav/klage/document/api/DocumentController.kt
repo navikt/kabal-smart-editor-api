@@ -52,7 +52,7 @@ class DocumentController(
         @PathVariable("documentId") documentId: UUID,
         @RequestBody json: String
     ): DocumentView {
-        logger.debug("updateDocument: received json: {}", json)
+        logger.debug("updateDocument with id {}: received json: {}", documentId, json)
         return mapToDocumentView(documentService.updateDocument(documentId, json))
     }
 
@@ -62,8 +62,18 @@ class DocumentController(
     )
     @GetMapping("/{documentId}")
     fun getDocument(@PathVariable("documentId") documentId: UUID): DocumentView {
-        logger.debug("getDocument")
+        logger.debug("getDocument with id {}", documentId)
         return mapToDocumentView(documentService.getDocument(documentId))
+    }
+
+    @ApiOperation(
+        value = "Delete document",
+        notes = "Delete document"
+    )
+    @DeleteMapping("/{documentId}")
+    fun deleteDocument(@PathVariable("documentId") documentId: UUID) {
+        logger.debug("deleteDocument with id {}", documentId)
+        documentService.deleteDocument(documentId)
     }
 
     @ApiOperation(

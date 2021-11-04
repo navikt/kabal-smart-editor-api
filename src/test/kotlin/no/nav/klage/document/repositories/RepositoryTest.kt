@@ -93,6 +93,14 @@ class RepositoryTest {
 
         assertThat(comments.first().comments).hasSize(2)
         assertThat(comments.first().comments.first()).isEqualTo(comment2)
+
+        commentRepository.deleteByDocumentId(document.id)
+        documentRepository.deleteById(document.id)
+
+        testEntityManager.flush()
+        testEntityManager.clear()
+
+        assertThat(documentRepository.findAll()).isEmpty()
     }
 
 }

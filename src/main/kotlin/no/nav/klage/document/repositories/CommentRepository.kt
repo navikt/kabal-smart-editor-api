@@ -11,4 +11,6 @@ interface CommentRepository : JpaRepository<Comment, UUID> {
      */
     fun findByDocumentIdAndParentCommentIdIsNullOrderByCreatedAsc(documentId: UUID): List<Comment>
 
+    fun deleteByDocumentId(documentId: UUID)
+
 }
