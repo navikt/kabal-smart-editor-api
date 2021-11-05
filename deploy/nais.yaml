@@ -74,7 +74,7 @@ spec:
       enabled: true
       tenant: {{tenant}}
       claims:
-        groups:
+#        groups:
 #          - id: {{ROLE_KLAGE_SAKSBEHANDLER}}
 #          - id: {{ROLE_KLAGE_FAGANSVARLIG}}
 #          - id: {{ROLE_KLAGE_LEDER}}
