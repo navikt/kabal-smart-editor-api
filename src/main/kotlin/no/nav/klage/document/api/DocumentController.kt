@@ -2,15 +2,18 @@ package no.nav.klage.document.api
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
-import io.swagger.annotations.ApiParam
 import no.nav.klage.document.api.views.CommentInput
 import no.nav.klage.document.api.views.CommentView
 import no.nav.klage.document.api.views.DocumentView
+import no.nav.klage.document.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.document.domain.Comment
 import no.nav.klage.document.domain.Document
 import no.nav.klage.document.service.CommentService
 import no.nav.klage.document.service.DocumentService
 import no.nav.klage.document.util.getLogger
+import no.nav.klage.document.util.getSecureLogger
+import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -19,16 +22,19 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
+@ProtectedWithClaims(issuer = ISSUER_AAD)
 @Api(tags = ["kabal-smart-editor-api"])
 @RequestMapping("/documents")
 class DocumentController(
     private val documentService: DocumentService,
-    private val commentService: CommentService
+    private val commentService: CommentService,
+    private val tokenValidationContextHolder: TokenValidationContextHolder
 ) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
     @ApiOperation(
@@ -39,7 +45,8 @@ class DocumentController(
     fun createDocument(
         @RequestBody json: String
     ): DocumentView {
-        logger.debug("createDocument: received json: {}", json)
+        log("createDocument")
+        secureLogger.debug("createDocument: received json: {}", json)
         return mapToDocumentView(documentService.createDocument(json))
     }
 
@@ -52,7 +59,8 @@ class DocumentController(
         @PathVariable("documentId") documentId: UUID,
         @RequestBody json: String
     ): DocumentView {
-        logger.debug("updateDocument with id {}: received json: {}", documentId, json)
+        log("updateDocument called with id $documentId")
+        secureLogger.debug("updateDocument with id {}: received json: {}", documentId, json)
         return mapToDocumentView(documentService.updateDocument(documentId, json))
     }
 
@@ -62,7 +70,7 @@ class DocumentController(
     )
     @GetMapping("/{documentId}")
     fun getDocument(@PathVariable("documentId") documentId: UUID): DocumentView {
-        logger.debug("getDocument with id {}", documentId)
+        log("getDocument called with id $documentId")
         return mapToDocumentView(documentService.getDocument(documentId))
     }
 
@@ -72,7 +80,7 @@ class DocumentController(
     )
     @DeleteMapping("/{documentId}")
     fun deleteDocument(@PathVariable("documentId") documentId: UUID) {
-        logger.debug("deleteDocument with id {}", documentId)
+        log("deleteDocument called with id $documentId")
         documentService.deleteDocument(documentId)
     }
 
@@ -85,7 +93,7 @@ class DocumentController(
         @PathVariable("documentId") documentId: UUID,
         @RequestBody commentInput: CommentInput
     ): CommentView {
-        logger.debug("createComment")
+        log("createComment called with id $documentId")
         return mapCommentToView(
             commentService.createComment(
                 documentId = documentId,
@@ -104,7 +112,7 @@ class DocumentController(
     fun getAllCommentsWithPossibleThreads(
         @PathVariable("documentId") documentId: UUID
     ): List<CommentView> {
-        logger.debug("getAllCommentsWithPossibleThreads")
+        log("getAllCommentsWithPossibleThreads called with id $documentId")
         return commentService.getComments(documentId).map { mapCommentToView(it) }
     }
 
@@ -118,7 +126,7 @@ class DocumentController(
         @PathVariable("commentId") commentId: UUID,
         @RequestBody commentInput: CommentInput,
     ): CommentView {
-        logger.debug("replyToComment")
+        log("replyToComment called with id $documentId and commentId $commentId")
         return mapCommentToView(
             commentService.replyToComment(
                 documentId = documentId,
@@ -139,7 +147,7 @@ class DocumentController(
         @PathVariable("documentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID
     ): CommentView {
-        logger.debug("getCommentWithPossibleThread")
+        log("getCommentWithPossibleThread called with id $documentId and commentId $commentId")
         return mapCommentToView(commentService.getComment(commentId = commentId))
     }
 
@@ -152,7 +160,7 @@ class DocumentController(
     fun getDocumentAsPDF(
         @PathVariable("documentId") documentId: UUID
     ): ResponseEntity<ByteArray> {
-        logger.debug("getDocumentAsPDF with id {}", documentId)
+        log("getDocumentAsPDF with id : $documentId")
 
         val pdfDocument = documentService.getDocumentAsPDF(documentId)
 
@@ -186,5 +194,15 @@ class DocumentController(
             created = comment.created,
             modified = comment.modified
         )
+
+    private fun log(message: String) {
+        logger.debug(message)
+        secureLogger.debug("{}. On-behalf-of: {}", message, getIdent())
+    }
+
+    fun getIdent(): String =
+        tokenValidationContextHolder.tokenValidationContext.getJwtToken(ISSUER_AAD)
+            .jwtTokenClaims?.get("NAVident")?.toString()
+            ?: throw RuntimeException("Ident not found in token")
 
 }
