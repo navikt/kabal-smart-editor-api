@@ -200,9 +200,8 @@ class DocumentController(
         secureLogger.debug("{}. On-behalf-of: {}", message, getIdent())
     }
 
-    fun getIdent(): String =
+    fun getIdent(): String? =
         tokenValidationContextHolder.tokenValidationContext.getJwtToken(ISSUER_AAD)
             .jwtTokenClaims?.get("NAVident")?.toString()
-            ?: throw RuntimeException("Ident not found in token")
 
 }
