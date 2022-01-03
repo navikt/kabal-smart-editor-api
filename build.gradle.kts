@@ -12,17 +12,17 @@ repositories {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.5.31"
-    id("org.springframework.boot") version "2.5.5"
-    id("org.jetbrains.kotlin.plugin.spring") version "1.5.31"
-    id("org.jetbrains.kotlin.plugin.jpa") version "1.5.31"
+    id("org.jetbrains.kotlin.jvm") version "1.6.0"
+    id("org.springframework.boot") version "2.5.7"
+    id("org.jetbrains.kotlin.plugin.spring") version "1.6.0"
+    id("org.jetbrains.kotlin.plugin.jpa") version "1.6.0"
     idea
 }
 
 apply(plugin = "io.spring.dependency-management")
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.31")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.0")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -52,7 +52,10 @@ dependencies {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions {
+        freeCompilerArgs = listOf("-Xjsr305=strict")
+        jvmTarget = "17"
+    }
 }
 
 tasks.withType<Test> {
@@ -65,9 +68,3 @@ tasks.withType<Test> {
 tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
     this.archiveFileName.set("app.jar")
 }
-
-kotlin.sourceSets["main"].kotlin.srcDirs("src/main/kotlin")
-kotlin.sourceSets["test"].kotlin.srcDirs("src/test/kotlin")
-
-//sourceSets["main"].resources.srcDirs("src/main/resources")
-//sourceSets["test"].resources.srcDirs("src/test/resources")
