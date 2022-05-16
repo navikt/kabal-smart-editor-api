@@ -38,6 +38,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP")
     implementation("org.postgresql:postgresql")
 
+    implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("ch.qos.logback:logback-classic:1.2.6")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
