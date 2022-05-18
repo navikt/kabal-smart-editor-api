@@ -18,11 +18,12 @@ class DocumentService(
     private val kabalJsonToPdfClient: KabalJsonToPdfClient
 ) {
 
-    fun createDocument(json: String): Document {
+    fun createDocument(json: String, templateId: String?): Document {
         val now = LocalDateTime.now()
         return documentRepository.save(
             Document(
                 json = json,
+                templateId = templateId,
                 created = now,
                 modified = now
             )

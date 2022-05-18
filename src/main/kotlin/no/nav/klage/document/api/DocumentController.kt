@@ -4,6 +4,7 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import no.nav.klage.document.api.views.CommentInput
 import no.nav.klage.document.api.views.CommentView
+import no.nav.klage.document.api.views.DocumentInput
 import no.nav.klage.document.api.views.DocumentView
 import no.nav.klage.document.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.document.domain.Comment
@@ -43,11 +44,11 @@ class DocumentController(
     )
     @PostMapping("")
     fun createDocument(
-        @RequestBody json: String
+        @RequestBody input: DocumentInput
     ): DocumentView {
         log("createDocument")
-        secureLogger.debug("createDocument: received json: {}", json)
-        return mapToDocumentView(documentService.createDocument(json))
+        secureLogger.debug("createDocument: received input: {}", input)
+        return mapToDocumentView(documentService.createDocument(json = input.json, templateId = input.templateId))
     }
 
     @ApiOperation(
@@ -178,6 +179,7 @@ class DocumentController(
         DocumentView(
             id = document.id,
             json = document.json,
+            templateId = document.templateId,
             created = document.created,
             modified = document.modified
         )

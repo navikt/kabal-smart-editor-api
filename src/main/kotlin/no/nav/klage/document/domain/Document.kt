@@ -14,6 +14,8 @@ class Document(
     val id: UUID = UUID.randomUUID(),
     @Column(name = "json")
     var json: String,
+    @Column(name = "template_id")
+    var templateId: String?,
     @Column(name = "created")
     val created: LocalDateTime,
     @Column(name = "modified")
@@ -35,7 +37,7 @@ class Document(
     }
 
     override fun toString(): String {
-        return "Document(id=$id, json='$json', created=$created, modified=$modified)"
+        return "Document(id=$id, json='$json', templateId='$templateId', created=$created, modified=$modified)"
     }
 
 }

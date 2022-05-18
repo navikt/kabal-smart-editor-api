@@ -36,11 +36,11 @@ class RepositoryTest {
 
     @Test
     fun `add document and comments work`() {
-
         val now = LocalDateTime.now()
 
         val document = Document(
             json = "{}",
+            templateId = "some_template",
             created = now,
             modified = now
         )
