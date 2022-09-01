@@ -3,7 +3,7 @@ package no.nav.klage.document.config
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import org.springframework.context.annotation.Configuration
 
-@EnableJwtTokenValidation(ignore = ["springfox"])
+@EnableJwtTokenValidation(ignore = ["org.springdoc"])
 @Configuration
 internal class SecurityConfiguration {
 

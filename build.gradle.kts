@@ -4,7 +4,7 @@ val mockkVersion = "1.12.7"
 val logstashVersion = "7.2"
 val springVersion = "2.5.5"
 val testContainersVersion = "1.17.3"
-val springFoxVersion = "3.0.0"
+val springDocVersion = "1.6.11"
 val tokenValidationVersion = "2.1.4"
 
 repositories {
@@ -32,7 +32,7 @@ dependencies {
 
     implementation("no.nav.security:token-validation-spring:$tokenValidationVersion")
 
-    implementation("io.springfox:springfox-boot-starter:$springFoxVersion")
+    implementation("org.springdoc:springdoc-openapi-ui:$springDocVersion")
 
     implementation("org.flywaydb:flyway-core")
     implementation("com.zaxxer:HikariCP")

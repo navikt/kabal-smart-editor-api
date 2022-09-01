@@ -1,7 +1,7 @@
 package no.nav.klage.document.api
 
-import io.swagger.annotations.Api
-import io.swagger.annotations.ApiOperation
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.document.api.views.CommentInput
 import no.nav.klage.document.api.views.CommentView
 import no.nav.klage.document.api.views.DocumentView
@@ -23,7 +23,7 @@ import java.util.*
 
 @RestController
 @ProtectedWithClaims(issuer = ISSUER_AAD)
-@Api(tags = ["kabal-smart-editor-api"])
+@Tag(name = "kabal-smart-editor-api")
 @RequestMapping("/documents")
 class DocumentController(
     private val documentService: DocumentService,
@@ -37,9 +37,9 @@ class DocumentController(
         private val secureLogger = getSecureLogger()
     }
 
-    @ApiOperation(
-        value = "Create document",
-        notes = "Create document"
+    @Operation(
+        summary = "Create document",
+        description = "Create document"
     )
     @PostMapping("")
     fun createDocument(
@@ -50,9 +50,9 @@ class DocumentController(
         return mapToDocumentView(documentService.createDocument(json))
     }
 
-    @ApiOperation(
-        value = "Update document",
-        notes = "Update document"
+    @Operation(
+        summary = "Update document",
+        description = "Update document"
     )
     @PutMapping("/{documentId}")
     fun updateDocument(
@@ -64,9 +64,9 @@ class DocumentController(
         return mapToDocumentView(documentService.updateDocument(documentId, json))
     }
 
-    @ApiOperation(
-        value = "Get document",
-        notes = "Get document"
+    @Operation(
+        summary = "Get document",
+        description = "Get document"
     )
     @GetMapping("/{documentId}")
     fun getDocument(@PathVariable("documentId") documentId: UUID): DocumentView {
@@ -74,9 +74,9 @@ class DocumentController(
         return mapToDocumentView(documentService.getDocument(documentId))
     }
 
-    @ApiOperation(
-        value = "Delete document",
-        notes = "Delete document"
+    @Operation(
+        summary = "Delete document",
+        description = "Delete document"
     )
     @DeleteMapping("/{documentId}")
     fun deleteDocument(@PathVariable("documentId") documentId: UUID) {
@@ -84,9 +84,9 @@ class DocumentController(
         documentService.deleteDocument(documentId)
     }
 
-    @ApiOperation(
-        value = "Create comment for a given document",
-        notes = "Create comment for a given document"
+    @Operation(
+        summary = "Create comment for a given document",
+        description = "Create comment for a given document"
     )
     @PostMapping("/{documentId}/comments")
     fun createComment(
@@ -104,9 +104,9 @@ class DocumentController(
         )
     }
 
-    @ApiOperation(
-        value = "Get all comments for a given document",
-        notes = "Get all comments for a given document"
+    @Operation(
+        summary = "Get all comments for a given document",
+        description = "Get all comments for a given document"
     )
     @GetMapping("/{documentId}/comments")
     fun getAllCommentsWithPossibleThreads(
@@ -116,9 +116,9 @@ class DocumentController(
         return commentService.getComments(documentId).map { mapCommentToView(it) }
     }
 
-    @ApiOperation(
-        value = "Reply to a given comment",
-        notes = "Reply to a given comment"
+    @Operation(
+        summary = "Reply to a given comment",
+        description = "Reply to a given comment"
     )
     @PostMapping("/{documentId}/comments/{commentId}/replies")
     fun replyToComment(
@@ -138,9 +138,9 @@ class DocumentController(
         )
     }
 
-    @ApiOperation(
-        value = "Get a given comment",
-        notes = "Get a given comment"
+    @Operation(
+        summary = "Get a given comment",
+        description = "Get a given comment"
     )
     @GetMapping("/{documentId}/comments/{commentId}")
     fun getCommentWithPossibleThread(
@@ -151,9 +151,9 @@ class DocumentController(
         return mapCommentToView(commentService.getComment(commentId = commentId))
     }
 
-    @ApiOperation(
-        value = "Generer PDF",
-        notes = "Generer PDF"
+    @Operation(
+        summary = "Generer PDF",
+        description = "Generer PDF"
     )
     @ResponseBody
     @GetMapping("/{documentId}/pdf")
