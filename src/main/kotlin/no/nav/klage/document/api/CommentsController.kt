@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.document.api.views.CommentInput
 import no.nav.klage.document.api.views.CommentView
+import no.nav.klage.document.api.views.ModifyCommentInput
 import no.nav.klage.document.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.document.domain.Comment
 import no.nav.klage.document.service.CommentService
@@ -87,17 +88,17 @@ class CommentsController(
         summary = "Modify a given comment",
         description = "Modify a given comment"
     )
-    @PostMapping("/{commentId}/replies")
+    @PatchMapping("/{commentId}")
     fun modifyComment(
         @PathVariable("documentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID,
-        @RequestBody commentInput: CommentInput,
+        @RequestBody modifyCommentInput: ModifyCommentInput,
     ): CommentView {
         log("modifyComment called with id $documentId and commentId $commentId")
         return mapCommentToView(
             commentService.modifyCommentText(
                 commentId = commentId,
-                text = commentInput.text,
+                text = modifyCommentInput.text,
                 loggedInIdent = getIdent()!!
             )
         )
