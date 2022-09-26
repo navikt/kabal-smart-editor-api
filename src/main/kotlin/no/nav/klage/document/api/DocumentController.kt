@@ -2,13 +2,9 @@ package no.nav.klage.document.api
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.klage.document.api.views.CommentInput
-import no.nav.klage.document.api.views.CommentView
 import no.nav.klage.document.api.views.DocumentView
 import no.nav.klage.document.config.SecurityConfiguration.Companion.ISSUER_AAD
-import no.nav.klage.document.domain.Comment
 import no.nav.klage.document.domain.Document
-import no.nav.klage.document.service.CommentService
 import no.nav.klage.document.service.DocumentService
 import no.nav.klage.document.util.getLogger
 import no.nav.klage.document.util.getSecureLogger
@@ -27,7 +23,6 @@ import java.util.*
 @RequestMapping("/documents")
 class DocumentController(
     private val documentService: DocumentService,
-    private val commentService: CommentService,
     private val tokenValidationContextHolder: TokenValidationContextHolder
 ) {
 
@@ -85,73 +80,6 @@ class DocumentController(
     }
 
     @Operation(
-        summary = "Create comment for a given document",
-        description = "Create comment for a given document"
-    )
-    @PostMapping("/{documentId}/comments")
-    fun createComment(
-        @PathVariable("documentId") documentId: UUID,
-        @RequestBody commentInput: CommentInput
-    ): CommentView {
-        log("createComment called with id $documentId")
-        return mapCommentToView(
-            commentService.createComment(
-                documentId = documentId,
-                text = commentInput.text,
-                authorName = commentInput.author.name,
-                authorIdent = commentInput.author.ident
-            )
-        )
-    }
-
-    @Operation(
-        summary = "Get all comments for a given document",
-        description = "Get all comments for a given document"
-    )
-    @GetMapping("/{documentId}/comments")
-    fun getAllCommentsWithPossibleThreads(
-        @PathVariable("documentId") documentId: UUID
-    ): List<CommentView> {
-        log("getAllCommentsWithPossibleThreads called with id $documentId")
-        return commentService.getComments(documentId).map { mapCommentToView(it) }
-    }
-
-    @Operation(
-        summary = "Reply to a given comment",
-        description = "Reply to a given comment"
-    )
-    @PostMapping("/{documentId}/comments/{commentId}/replies")
-    fun replyToComment(
-        @PathVariable("documentId") documentId: UUID,
-        @PathVariable("commentId") commentId: UUID,
-        @RequestBody commentInput: CommentInput,
-    ): CommentView {
-        log("replyToComment called with id $documentId and commentId $commentId")
-        return mapCommentToView(
-            commentService.replyToComment(
-                documentId = documentId,
-                parentCommentId = commentId,
-                text = commentInput.text,
-                authorName = commentInput.author.name,
-                authorIdent = commentInput.author.ident
-            )
-        )
-    }
-
-    @Operation(
-        summary = "Get a given comment",
-        description = "Get a given comment"
-    )
-    @GetMapping("/{documentId}/comments/{commentId}")
-    fun getCommentWithPossibleThread(
-        @PathVariable("documentId") documentId: UUID,
-        @PathVariable("commentId") commentId: UUID
-    ): CommentView {
-        log("getCommentWithPossibleThread called with id $documentId and commentId $commentId")
-        return mapCommentToView(commentService.getComment(commentId = commentId))
-    }
-
-    @Operation(
         summary = "Generer PDF",
         description = "Generer PDF"
     )
@@ -180,19 +108,6 @@ class DocumentController(
             json = document.json,
             created = document.created,
             modified = document.modified
-        )
-
-    private fun mapCommentToView(comment: Comment): CommentView =
-        CommentView(
-            id = comment.id,
-            text = comment.text,
-            author = CommentView.Author(
-                name = comment.authorName,
-                ident = comment.authorIdent
-            ),
-            comments = comment.comments.map { mapCommentToView(it) },
-            created = comment.created,
-            modified = comment.modified
         )
 
     private fun log(message: String) {

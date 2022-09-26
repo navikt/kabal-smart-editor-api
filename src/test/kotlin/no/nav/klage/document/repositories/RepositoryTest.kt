@@ -53,7 +53,7 @@ class RepositoryTest {
         val foundDocument = documentRepository.findById(document.id).get()
         assertThat(foundDocument).isEqualTo(document)
 
-        val comment1 = Comment(
+        val comment1Parent = Comment(
             documentId = document.id,
             text = "my comment 1",
             authorName = "Kalle Anka",
@@ -64,7 +64,7 @@ class RepositoryTest {
 
         val comment2 = Comment(
             documentId = document.id,
-            parentCommentId = comment1.id,
+            parentCommentId = comment1Parent.id,
             text = "my sub comment 1",
             authorName = "Kajsa Anka",
             authorIdent = "Z654321",
@@ -74,7 +74,7 @@ class RepositoryTest {
 
         val comment3 = Comment(
             documentId = document.id,
-            parentCommentId = comment1.id,
+            parentCommentId = comment1Parent.id,
             text = "my sub comment 2",
             authorName = "Kajsa Anka",
             authorIdent = "Z654321",
@@ -82,7 +82,7 @@ class RepositoryTest {
             modified = now.plusDays(3)
         )
 
-        commentRepository.save(comment1)
+        commentRepository.save(comment1Parent)
         commentRepository.save(comment2)
         commentRepository.save(comment3)
 
@@ -100,6 +100,75 @@ class RepositoryTest {
         testEntityManager.flush()
         testEntityManager.clear()
 
+        assertThat(documentRepository.findAll()).isEmpty()
+    }
+
+    @Test
+    fun `child comments are removed with parent`() {
+        val now = LocalDateTime.now()
+
+        val document = Document(
+            json = "{}",
+            created = now,
+            modified = now
+        )
+
+        documentRepository.save(document)
+
+        testEntityManager.flush()
+        testEntityManager.clear()
+
+        val foundDocument = documentRepository.findById(document.id).get()
+        assertThat(foundDocument).isEqualTo(document)
+
+        val comment1Parent = Comment(
+            documentId = document.id,
+            text = "my comment 1",
+            authorName = "Kalle Anka",
+            authorIdent = "Z123456",
+            created = now.plusDays(1),
+            modified = now.plusDays(1)
+        )
+
+        val comment2 = Comment(
+            documentId = document.id,
+            parentCommentId = comment1Parent.id,
+            text = "my sub comment 1",
+            authorName = "Kajsa Anka",
+            authorIdent = "Z654321",
+            created = now.plusDays(2),
+            modified = now.plusDays(2)
+        )
+
+        val comment3 = Comment(
+            documentId = document.id,
+            parentCommentId = comment1Parent.id,
+            text = "my sub comment 2",
+            authorName = "Kajsa Anka",
+            authorIdent = "Z654321",
+            created = now.plusDays(3),
+            modified = now.plusDays(3)
+        )
+
+        commentRepository.save(comment1Parent)
+        commentRepository.save(comment2)
+        commentRepository.save(comment3)
+
+        testEntityManager.flush()
+        testEntityManager.clear()
+
+        val comments = commentRepository.findByDocumentIdAndParentCommentIdIsNullOrderByCreatedAsc(document.id)
+
+        assertThat(comments.first().comments).hasSize(2)
+        assertThat(comments.first().comments.first()).isEqualTo(comment2)
+
+        commentRepository.deleteById(comment1Parent.id)
+        documentRepository.deleteById(document.id)
+
+        testEntityManager.flush()
+        testEntityManager.clear()
+
+        assertThat(commentRepository.findAll()).isEmpty()
         assertThat(documentRepository.findAll()).isEmpty()
     }
 
