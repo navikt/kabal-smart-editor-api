@@ -54,12 +54,13 @@ class CommentService(private val commentRepository: CommentRepository) {
         return commentRepository.getReferenceById(commentId)
     }
 
-    fun modifyCommentText(commentId: UUID, text: String, loggedInIdent: String): Comment {
+    fun setCommentText(commentId: UUID, text: String, loggedInIdent: String): Comment {
         val comment = commentRepository.getReferenceById(commentId)
         if (comment.authorIdent != loggedInIdent) {
             throw RuntimeException("Not allowed to modify others comment")
         }
         comment.text = text
+        comment.modified = LocalDateTime.now()
         return comment
     }
 

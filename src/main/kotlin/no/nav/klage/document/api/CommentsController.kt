@@ -96,7 +96,7 @@ class CommentsController(
     ): CommentView {
         log("modifyComment called with id $documentId and commentId $commentId")
         return mapCommentToView(
-            commentService.modifyCommentText(
+            commentService.setCommentText(
                 commentId = commentId,
                 text = modifyCommentInput.text,
                 loggedInIdent = getIdent()!!
