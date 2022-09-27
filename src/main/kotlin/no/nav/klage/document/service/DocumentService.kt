@@ -30,18 +30,18 @@ class DocumentService(
     }
 
     fun updateDocument(documentId: UUID, json: String): Document {
-        val document = documentRepository.getById(documentId)
+        val document = documentRepository.getReferenceById(documentId)
         document.json = json
         document.modified = LocalDateTime.now()
         return document
     }
 
     fun getDocument(documentId: UUID): Document {
-        return documentRepository.getById(documentId)
+        return documentRepository.getReferenceById(documentId)
     }
 
     fun getDocumentAsPDF(documentId: UUID): PDFDocument {
-        return kabalJsonToPdfClient.getPDFDocument(documentRepository.getById(documentId).json)
+        return kabalJsonToPdfClient.getPDFDocument(documentRepository.getReferenceById(documentId).json)
     }
 
     fun deleteDocument(documentId: UUID) {

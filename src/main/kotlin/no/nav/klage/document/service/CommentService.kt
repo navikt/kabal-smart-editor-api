@@ -51,7 +51,25 @@ class CommentService(private val commentRepository: CommentRepository) {
     }
 
     fun getComment(commentId: UUID): Comment {
-        return commentRepository.getById(commentId)
+        return commentRepository.getReferenceById(commentId)
+    }
+
+    fun setCommentText(commentId: UUID, text: String, loggedInIdent: String): Comment {
+        val comment = commentRepository.getReferenceById(commentId)
+        if (comment.authorIdent != loggedInIdent) {
+            throw RuntimeException("Not allowed to modify others comment")
+        }
+        comment.text = text
+        comment.modified = LocalDateTime.now()
+        return comment
+    }
+
+    fun deleteComment(commentId: UUID, loggedInIdent: String) {
+        val comment = commentRepository.getReferenceById(commentId)
+        if (comment.authorIdent != loggedInIdent) {
+            throw RuntimeException("Not allowed to delete others comment")
+        }
+        commentRepository.delete(comment)
     }
 
 }
