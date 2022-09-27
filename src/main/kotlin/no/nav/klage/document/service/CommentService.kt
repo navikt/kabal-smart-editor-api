@@ -1,6 +1,7 @@
 package no.nav.klage.document.service
 
 import no.nav.klage.document.domain.Comment
+import no.nav.klage.document.exceptions.MissingAccessException
 import no.nav.klage.document.repositories.CommentRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -57,7 +58,7 @@ class CommentService(private val commentRepository: CommentRepository) {
     fun setCommentText(commentId: UUID, text: String, loggedInIdent: String): Comment {
         val comment = commentRepository.getReferenceById(commentId)
         if (comment.authorIdent != loggedInIdent) {
-            throw RuntimeException("Not allowed to modify others comment")
+            throw MissingAccessException("Not allowed to modify others comment")
         }
         comment.text = text
         comment.modified = LocalDateTime.now()
@@ -67,7 +68,7 @@ class CommentService(private val commentRepository: CommentRepository) {
     fun deleteComment(commentId: UUID, loggedInIdent: String) {
         val comment = commentRepository.getReferenceById(commentId)
         if (comment.authorIdent != loggedInIdent) {
-            throw RuntimeException("Not allowed to delete others comment")
+            throw MissingAccessException("Not allowed to delete others comment")
         }
         commentRepository.delete(comment)
     }
