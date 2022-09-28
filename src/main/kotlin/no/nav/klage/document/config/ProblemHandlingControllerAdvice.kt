@@ -3,6 +3,7 @@ package no.nav.klage.document.config
 import no.nav.klage.document.exceptions.MissingAccessException
 import no.nav.klage.document.util.getLogger
 import org.springframework.http.ResponseEntity
+import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.NativeWebRequest
@@ -10,7 +11,6 @@ import org.zalando.problem.Problem
 import org.zalando.problem.Status
 import org.zalando.problem.spring.web.advice.AdviceTrait
 import org.zalando.problem.spring.web.advice.ProblemHandling
-import javax.persistence.EntityNotFoundException
 
 @ControllerAdvice
 class ProblemHandlingControllerAdvice : OurOwnExceptionAdviceTrait, ProblemHandling
@@ -24,7 +24,7 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
 
     @ExceptionHandler
     fun handleEntityNotFound(
-        ex: EntityNotFoundException,
+        ex: JpaObjectRetrievalFailureException,
         request: NativeWebRequest
     ): ResponseEntity<Problem> =
         create(Status.NOT_FOUND, ex, request)
