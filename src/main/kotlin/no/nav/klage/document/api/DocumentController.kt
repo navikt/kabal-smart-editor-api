@@ -102,6 +102,19 @@ class DocumentController(
         )
     }
 
+    @Operation(
+        summary = "Validerer dokument",
+        description = "Validerer dokument"
+    )
+    @ResponseBody
+    @GetMapping("/{documentId}/validate")
+    fun validateDocument(
+        @PathVariable("documentId") documentId: UUID
+    ) {
+        log("${::validateDocument.name} with id : $documentId")
+        documentService.validateDocument(documentId)
+    }
+
     private fun mapToDocumentView(document: Document): DocumentView =
         DocumentView(
             id = document.id,

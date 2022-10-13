@@ -5,6 +5,7 @@ import no.nav.klage.document.util.getLogger
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.bodyToMono
 
 @Component
 class KabalJsonToPdfClient(
@@ -30,5 +31,15 @@ class KabalJsonToPdfClient(
                 )
             }
             .block() ?: throw RuntimeException("PDF could not be created")
+    }
+
+    fun validateDocument(json: String) {
+        return kabalJsonToPdfWebClient.post()
+            .uri { it.path("/validate").build() }
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(json)
+            .retrieve()
+            .bodyToMono<Unit>()
+            .block() ?: throw RuntimeException("kabal-json-to-pdf could not be reached")
     }
 }

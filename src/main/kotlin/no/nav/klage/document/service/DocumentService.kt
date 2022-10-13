@@ -44,6 +44,10 @@ class DocumentService(
         return kabalJsonToPdfClient.getPDFDocument(documentRepository.getReferenceById(documentId).json)
     }
 
+    fun validateDocument(documentId: UUID) {
+        return kabalJsonToPdfClient.validateDocument(documentRepository.getReferenceById(documentId).json)
+    }
+
     fun deleteDocument(documentId: UUID) {
         commentRepository.deleteByDocumentId(documentId)
         documentRepository.deleteById(documentId)
