@@ -1,11 +1,14 @@
 package no.nav.klage.document.clients
 
 import no.nav.klage.document.domain.PDFDocument
+import no.nav.klage.document.exceptions.ValidationException
 import no.nav.klage.document.util.getLogger
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
+import reactor.core.publisher.Mono
 
 @Component
 class KabalJsonToPdfClient(
@@ -39,6 +42,10 @@ class KabalJsonToPdfClient(
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(json)
             .retrieve()
+            .onStatus(HttpStatus::isError) { response ->
+                logger.debug("error when validating: $response")
+                response.bodyToMono<String>().map { ValidationException(it) }
+            }
             .bodyToMono<Unit>()
             .block() ?: throw RuntimeException("kabal-json-to-pdf could not be reached")
     }
