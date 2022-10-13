@@ -1,5 +1,6 @@
 package no.nav.klage.document.clients
 
+import brave.Tracer
 import no.nav.klage.document.domain.PDFDocument
 import no.nav.klage.document.exceptions.ValidationException
 import no.nav.klage.document.util.getLogger
@@ -12,7 +13,8 @@ import reactor.core.publisher.Mono
 
 @Component
 class KabalJsonToPdfClient(
-    private val kabalJsonToPdfWebClient: WebClient
+    private val kabalJsonToPdfWebClient: WebClient,
+    private val tracer: Tracer
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -24,6 +26,7 @@ class KabalJsonToPdfClient(
             .uri { it.path("/topdf").build() }
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(json)
+            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .toEntity(ByteArray::class.java)
             .map {
@@ -41,6 +44,7 @@ class KabalJsonToPdfClient(
             .uri { it.path("/validate").build() }
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(json)
+            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .onStatus(HttpStatus::isError) { response ->
                 logger.debug("error when validating: $response")
