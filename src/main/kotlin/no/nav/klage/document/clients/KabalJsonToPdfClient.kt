@@ -46,6 +46,10 @@ class KabalJsonToPdfClient(
             .bodyValue(json)
             .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
+            .onStatus(HttpStatus::isError) { response ->
+                logger.debug("error when validating: $response")
+                response.bodyToMono<String>().map { ValidationException(it) }
+            }
             .bodyToMono<Unit>()
             .block() ?: throw RuntimeException("kabal-json-to-pdf could not be reached")
     }
