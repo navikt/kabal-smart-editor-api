@@ -6,10 +6,12 @@ import no.nav.klage.document.exceptions.ValidationException
 import no.nav.klage.document.util.getLogger
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
-import reactor.core.publisher.Mono
+import org.springframework.web.reactive.function.client.toEntity
 
 @Component
 class KabalJsonToPdfClient(
@@ -32,7 +34,8 @@ class KabalJsonToPdfClient(
             .map {
                 val filename = it.headers["filename"]?.first()
                 PDFDocument(
-                    filename = filename ?: "somefilename",//throw RuntimeException("Could not get filename from headers"),
+                    filename = filename
+                        ?: "somefilename",//throw RuntimeException("Could not get filename from headers"),
                     bytes = it.body ?: throw RuntimeException("Could not get PDF data")
                 )
             }
@@ -46,10 +49,16 @@ class KabalJsonToPdfClient(
             .bodyValue(json)
             .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
-            .onStatus(HttpStatus::isError) { response ->
-                logger.debug("error when validating: $response")
-                response.bodyToMono<String>().map { ValidationException(it) }
-            }
+            .onStatus(
+                { status: HttpStatus -> status.isError },
+                { errorResponse: ClientResponse ->
+                    errorResponse.toEntity<String>().subscribe { entity: ResponseEntity<String> ->
+                        logger.error("Feilet med å validere dokument. Feil: {}", entity.toString())
+                        throw ValidationException(entity.toString())
+                    }
+                    errorResponse.createException()
+                })
+
             .bodyToMono<Unit>()
             .block() ?: throw RuntimeException("kabal-json-to-pdf could not be reached")
     }
