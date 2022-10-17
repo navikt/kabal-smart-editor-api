@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val mockkVersion = "1.13.2"
 val logstashVersion = "7.2"
 val springVersion = "2.5.5"
+val springSleuthVersion = "3.1.4"
 val testContainersVersion = "1.17.5"
 val springDocVersion = "1.6.11"
 val tokenValidationVersion = "2.1.6"
@@ -31,6 +32,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.cloud:spring-cloud-starter-sleuth:$springSleuthVersion")
 
     implementation("org.zalando:problem-spring-web-starter:$problemSpringWebStartVersion")
 
