@@ -6,7 +6,7 @@ val springVersion = "2.5.5"
 val springSleuthVersion = "3.1.4"
 val testContainersVersion = "1.17.5"
 val springDocVersion = "1.6.12"
-val tokenValidationVersion = "2.1.6"
+val tokenValidationVersion = "2.1.7"
 val problemSpringWebStartVersion = "0.27.0"
 
 repositories {
