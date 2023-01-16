@@ -44,6 +44,8 @@ server:
       enabled: false
   shutdown: graceful
 
+navCallIdName: Nav-Callid
+
 management:
   endpoint:
     health:
@@ -53,11 +55,19 @@ management:
       include: info, health, metrics, prometheus
     base-path: "/internal"
   metrics:
-    export:
-      prometheus:
-        enabled: true
     tags:
       application: ${spring.application.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  tracing:
+    baggage:
+      remote-fields:
+        - ${navCallIdName}
+      correlation:
+        fields:
+          - ${navCallIdName}
 
 no.nav.security.jwt:
   issuer:
@@ -65,6 +75,4 @@ no.nav.security.jwt:
       discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
       accepted_audience: ${AZURE_APP_CLIENT_ID}
 
-navCallId: Nav-Callid
-navConsumerId: Nav-Consumer-Id
 
