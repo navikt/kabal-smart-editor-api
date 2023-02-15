@@ -1,21 +1,19 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val mockkVersion = "1.13.2"
+val mockkVersion = "1.13.4"
 val logstashVersion = "7.2"
-val springVersion = "2.5.5"
-val springSleuthVersion = "3.1.5"
-val testContainersVersion = "1.17.5"
-val springDocVersion = "1.6.12"
-val tokenValidationVersion = "2.1.7"
-val problemSpringWebStartVersion = "0.27.0"
+val testContainersVersion = "1.17.6"
+val springDocVersion = "2.0.2"
+val tokenValidationVersion = "3.0.2"
+val kotlinVersion = "1.8.10"
 
 repositories {
     mavenCentral()
 }
 
 plugins {
-    val kotlinVersion = "1.7.21"
-    id("org.springframework.boot") version "2.7.5"
+    val kotlinVersion = "1.8.0"
+    id("org.springframework.boot") version "3.0.2"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
@@ -25,37 +23,35 @@ plugins {
 apply(plugin = "io.spring.dependency-management")
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.7.21")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.cloud:spring-cloud-starter-sleuth:$springSleuthVersion")
-
-    implementation("org.zalando:problem-spring-web-starter:$problemSpringWebStartVersion")
 
     implementation("no.nav.security:token-validation-spring:$tokenValidationVersion")
 
-    implementation("org.springdoc:springdoc-openapi-ui:$springDocVersion")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
 
     implementation("org.flywaydb:flyway-core")
     implementation("com.zaxxer:HikariCP")
     implementation("org.postgresql:postgresql")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("io.micrometer:micrometer-tracing-bridge-brave")
+
     implementation("ch.qos.logback:logback-classic")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2")
 
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
     testImplementation("org.testcontainers:postgresql:$testContainersVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
-    testImplementation("org.springframework:spring-mock:2.0.8")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.mockito:mockito-inline:4.8.1")
+    testImplementation("org.mockito:mockito-inline:5.1.1")
 }
 
 tasks.withType<KotlinCompile> {

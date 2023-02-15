@@ -1,38 +1,59 @@
 package no.nav.klage.document.config
 
 import no.nav.klage.document.exceptions.MissingAccessException
-import no.nav.klage.document.util.getLogger
-import org.springframework.http.ResponseEntity
+import no.nav.klage.document.util.getSecureLogger
+import org.springframework.http.HttpStatus
+import org.springframework.http.ProblemDetail
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
-import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.NativeWebRequest
-import org.zalando.problem.Problem
-import org.zalando.problem.Status
-import org.zalando.problem.spring.web.advice.AdviceTrait
-import org.zalando.problem.spring.web.advice.ProblemHandling
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
-@ControllerAdvice
-class ProblemHandlingControllerAdvice : OurOwnExceptionAdviceTrait, ProblemHandling
-
-interface OurOwnExceptionAdviceTrait : AdviceTrait {
+@RestControllerAdvice
+class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
 
     companion object {
-        @Suppress("JAVA_CLASS_ON_COMPANION")
-        private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
     @ExceptionHandler
     fun handleEntityNotFound(
         ex: JpaObjectRetrievalFailureException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.NOT_FOUND, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
     fun handleMissingAccess(
         ex: MissingAccessException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.FORBIDDEN, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.FORBIDDEN, ex)
+
+    private fun create(httpStatus: HttpStatus, ex: Exception): ProblemDetail {
+        val errorMessage = ex.message ?: "No error message available"
+
+        logError(
+            httpStatus = httpStatus,
+            errorMessage = errorMessage,
+            exception = ex
+        )
+
+        return ProblemDetail.forStatusAndDetail(httpStatus, errorMessage).apply {
+            title = errorMessage
+        }
+    }
+
+    private fun logError(httpStatus: HttpStatus, errorMessage: String, exception: Exception) {
+        when {
+            httpStatus.is5xxServerError -> {
+                secureLogger.error("Exception thrown to client: ${httpStatus.reasonPhrase}, $errorMessage", exception)
+            }
+
+            else -> {
+                secureLogger.warn("Exception thrown to client: ${httpStatus.reasonPhrase}, $errorMessage", exception)
+            }
+        }
+    }
 }
