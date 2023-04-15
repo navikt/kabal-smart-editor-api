@@ -1,5 +1,6 @@
 ingresses:
   - https://kabal-smart-editor-api.dev.intern.nav.no
+  - https://kabal-smart-editor-api.intern.dev.nav.no
 externalHosts:
 springProfile: dev-gcp
 db_tier: db-custom-1-3840
