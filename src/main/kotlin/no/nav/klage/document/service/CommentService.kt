@@ -67,9 +67,6 @@ class CommentService(private val commentRepository: CommentRepository) {
 
     fun deleteComment(commentId: UUID, loggedInIdent: String) {
         val comment = commentRepository.getReferenceById(commentId)
-        if (comment.authorIdent != loggedInIdent) {
-            throw MissingAccessException("Not allowed to delete others comment")
-        }
         commentRepository.delete(comment)
     }
 
