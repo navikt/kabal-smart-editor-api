@@ -15,5 +15,5 @@ data class ModifyCommentInput(
 )
 
 data class DeleteCommentInput(
-    val behandlingTildeltIdent: String?,
+    val behandlingTildeltIdent: String? = null,
 )
