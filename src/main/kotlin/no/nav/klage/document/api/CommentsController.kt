@@ -126,7 +126,7 @@ class CommentsController(
     fun deleteCommentWithPossibleThread(
         @PathVariable("documentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID,
-        @RequestBody deleteCommentInput: DeleteCommentInput
+        @RequestBody(required = false) deleteCommentInput: DeleteCommentInput
     ) {
         log("deleteCommentWithPossibleThread called with id $documentId and commentId $commentId")
         commentService.deleteComment(commentId = commentId, loggedInIdent = getIdent()!!, behandlingTildeltIdent = deleteCommentInput.behandlingTildeltIdent)
