@@ -65,12 +65,16 @@ class CommentService(private val commentRepository: CommentRepository) {
         return comment
     }
 
-    fun deleteComment(commentId: UUID, loggedInIdent: String) {
+    fun deleteComment(
+        commentId: UUID,
+        loggedInIdent: String,
+        behandlingTildeltIdent: String?
+    ) {
+        val loggedInIsDocumentOwner = loggedInIdent == behandlingTildeltIdent
         val comment = commentRepository.getReferenceById(commentId)
-        if (comment.authorIdent != loggedInIdent) {
-            throw MissingAccessException("Not allowed to delete others comment")
+        if (!loggedInIsDocumentOwner && comment.authorIdent != loggedInIdent) {
+            throw MissingAccessException("Not allowed to delete others comment when not document owner")
         }
         commentRepository.delete(comment)
     }
-
 }
