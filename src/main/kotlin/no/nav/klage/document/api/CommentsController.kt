@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.document.api.views.CommentInput
 import no.nav.klage.document.api.views.CommentView
+import no.nav.klage.document.api.views.DeleteCommentInput
 import no.nav.klage.document.api.views.ModifyCommentInput
 import no.nav.klage.document.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.document.domain.Comment
@@ -117,17 +118,32 @@ class CommentsController(
         return mapCommentToView(commentService.getComment(commentId = commentId))
     }
 
+    @Deprecated("Use POST /{commentId}/delete")
     @Operation(
         summary = "Delete a given comment (includes possible thread)",
         description = "Delete a given comment (includes possible thread)"
     )
     @DeleteMapping("/{commentId}")
-    fun deleteCommentWithPossibleThread(
+    fun deleteCommentWithPossibleThreadDeprecated(
         @PathVariable("documentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID
     ) {
+        log("deleteCommentWithPossibleThreadDeprecated called with id $documentId and commentId $commentId")
+        commentService.deleteComment(commentId = commentId, loggedInIdent = getIdent()!!, behandlingTildeltIdent = null)
+    }
+
+    @Operation(
+        summary = "Delete a given comment (includes possible thread)",
+        description = "Delete a given comment (includes possible thread)"
+    )
+    @PostMapping("/{commentId}/delete")
+    fun deleteCommentWithPossibleThread(
+        @PathVariable("documentId") documentId: UUID,
+        @PathVariable("commentId") commentId: UUID,
+        @RequestBody deleteCommentInput: DeleteCommentInput
+    ) {
         log("deleteCommentWithPossibleThread called with id $documentId and commentId $commentId")
-        commentService.deleteComment(commentId = commentId, loggedInIdent = getIdent()!!)
+        commentService.deleteComment(commentId = commentId, loggedInIdent = getIdent()!!, behandlingTildeltIdent = deleteCommentInput.behandlingTildeltIdent)
     }
 
     private fun mapCommentToView(comment: Comment): CommentView =
