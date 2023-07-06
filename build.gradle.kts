@@ -5,7 +5,7 @@ val logstashVersion = "7.4"
 val testContainersVersion = "1.18.3"
 val springDocVersion = "2.1.0"
 val tokenValidationVersion = "3.1.0"
-val kotlinVersion = "1.8.22"
+val kotlinVersion = "1.9.0"
 
 repositories {
     mavenCentral()
