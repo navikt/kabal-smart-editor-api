@@ -12,12 +12,10 @@ import java.util.*
 class Document(
     @Id
     val id: UUID = UUID.randomUUID(),
-    @Column(name = "json")
-    var json: String,
     @Column(name = "created")
     val created: LocalDateTime,
     @Column(name = "modified")
-    var modified: LocalDateTime
+    var modified: LocalDateTime,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -35,7 +33,7 @@ class Document(
     }
 
     override fun toString(): String {
-        return "Document(id=$id, json='$json', created=$created, modified=$modified)"
+        return "Document(id=$id, created=$created, modified=$modified)"
     }
 
 }

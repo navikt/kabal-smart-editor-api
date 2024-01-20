@@ -2,18 +2,15 @@ package no.nav.klage.document.api
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.klage.document.api.views.DocumentVersionView
 import no.nav.klage.document.api.views.DocumentView
 import no.nav.klage.document.config.SecurityConfiguration.Companion.ISSUER_AAD
-import no.nav.klage.document.domain.Document
+import no.nav.klage.document.domain.DocumentVersion
 import no.nav.klage.document.service.DocumentService
+import no.nav.klage.document.util.TokenUtil
 import no.nav.klage.document.util.getLogger
 import no.nav.klage.document.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.security.token.support.core.context.TokenValidationContextHolder
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -23,7 +20,7 @@ import java.util.*
 @RequestMapping("/documents")
 class DocumentController(
     private val documentService: DocumentService,
-    private val tokenValidationContextHolder: TokenValidationContextHolder
+    private val tokenUtil: TokenUtil,
 ) {
 
     companion object {
@@ -63,10 +60,13 @@ class DocumentController(
         summary = "Get document",
         description = "Get document"
     )
-    @GetMapping("/{documentId}")
-    fun getDocument(@PathVariable("documentId") documentId: UUID): DocumentView {
-        log("getDocument called with id $documentId")
-        return mapToDocumentView(documentService.getDocument(documentId))
+    @GetMapping("/{documentId}", "/{documentId}/versions/{version}")
+    fun getDocument(
+        @PathVariable("documentId") documentId: UUID,
+        @PathVariable("version", required = false) version: Int?,
+    ): DocumentView {
+        log("getDocument called with id $documentId and version $version")
+        return mapToDocumentView(documentService.getDocument(documentId = documentId, version = version))
     }
 
     @Operation(
@@ -80,43 +80,42 @@ class DocumentController(
     }
 
     @Operation(
-        summary = "Generer PDF",
-        description = "Generer PDF"
+        summary = "Get document versions",
+        description = "Get document versions"
     )
-    @ResponseBody
-    @GetMapping("/{documentId}/pdf")
-    fun getDocumentAsPDF(
-        @PathVariable("documentId") documentId: UUID
-    ): ResponseEntity<ByteArray> {
-        log("getDocumentAsPDF with id : $documentId")
+    @GetMapping("/{documentId}/versions")
+    fun getDocumentVersions(@PathVariable("documentId") documentId: UUID): List<DocumentVersionView> {
+        log("getDocumentVersions called with id $documentId")
+        val documentVersions = documentService.getDocumentVersions(documentId = documentId)
 
-        val pdfDocument = documentService.getDocumentAsPDF(documentId)
-
-        val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = MediaType.APPLICATION_PDF
-        responseHeaders.add("Content-Disposition", "inline; filename=${pdfDocument.filename}.pdf")
-        return ResponseEntity(
-            pdfDocument.bytes,
-            responseHeaders,
-            HttpStatus.OK
-        )
+        return documentVersions.map {
+            mapToDocumentVersionView(it)
+        }
     }
 
-    private fun mapToDocumentView(document: Document): DocumentView =
+    private fun mapToDocumentView(documentVersion: DocumentVersion): DocumentView =
         DocumentView(
-            id = document.id,
-            json = document.json,
-            created = document.created,
-            modified = document.modified
+            id = documentVersion.documentId,
+            documentId = documentVersion.documentId,
+            version = documentVersion.version,
+            json = documentVersion.json,
+            authorNavIdent = documentVersion.authorNavIdent,
+            created = documentVersion.created,
+            modified = documentVersion.modified
+        )
+
+    private fun mapToDocumentVersionView(documentVersion: DocumentVersion): DocumentVersionView =
+        DocumentVersionView(
+            documentId = documentVersion.documentId,
+            version = documentVersion.version,
+            authorNavIdent = documentVersion.authorNavIdent,
+            created = documentVersion.created,
+            modified = documentVersion.modified
         )
 
     private fun log(message: String) {
         logger.debug(message)
-        secureLogger.debug("{}. On-behalf-of: {}", message, getIdent())
+        secureLogger.debug("{}. On-behalf-of: {}", message, tokenUtil.getIdent())
     }
-
-    fun getIdent(): String? =
-        tokenValidationContextHolder.tokenValidationContext.getJwtToken(ISSUER_AAD)
-            .jwtTokenClaims?.get("NAVident")?.toString()
 
 }
