@@ -50,17 +50,14 @@ class DocumentController(
     @PutMapping("/{documentId}")
     fun updateDocument(
         @PathVariable("documentId") documentId: UUID,
-        @RequestBody(required = false) json: String?,
-        @RequestBody(required = false) input: DocumentUpdateInput?,
+        @RequestBody(required = false) input: DocumentUpdateInput,
     ): DocumentView {
-        val jsonToUse = input?.json ?: json!!
-
         log("updateDocument called with id $documentId")
-        secureLogger.debug("updateDocument with id {}: current version: {} received json: {}", documentId, input?.currentVersion, jsonToUse)
+        secureLogger.debug("updateDocument with id {}: current version: {} received json: {}", documentId, input.currentVersion, input.json)
         return mapToDocumentView(documentService.updateDocument(
             documentId = documentId,
-            json = jsonToUse,
-            currentVersion = input?.currentVersion,
+            json = input.json,
+            currentVersion = input.currentVersion,
         ))
     }
 
