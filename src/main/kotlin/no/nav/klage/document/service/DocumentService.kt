@@ -7,6 +7,8 @@ import no.nav.klage.document.repositories.CommentRepository
 import no.nav.klage.document.repositories.DocumentRepository
 import no.nav.klage.document.repositories.DocumentVersionRepository
 import no.nav.klage.document.util.TokenUtil
+import no.nav.klage.document.util.getLogger
+import no.nav.klage.document.util.getSecureLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -20,6 +22,12 @@ class DocumentService(
     private val documentRepository: DocumentRepository,
     private val tokenUtil: TokenUtil,
 ) {
+
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
+    }
 
     fun createDocument(json: String): DocumentVersion {
         val now = LocalDateTime.now()
@@ -43,9 +51,14 @@ class DocumentService(
         )
     }
 
-    fun updateDocument(documentId: UUID, json: String): DocumentVersion {
+    fun updateDocument(documentId: UUID, json: String, currentVersion: Int?): DocumentVersion {
         val now = LocalDateTime.now()
         val latestVersionNumber = documentVersionRepository.findLatestVersionNumber(documentId = documentId)
+
+        if (currentVersion != null && latestVersionNumber != currentVersion) {
+            logger.warn("latest version {} does not match clients current version {}", latestVersionNumber, currentVersion)
+        }
+
         val documentVersion = documentVersionRepository.findByDocumentIdAndVersion(documentId = documentId, version = latestVersionNumber)
         return documentVersionRepository.save(
             DocumentVersion(

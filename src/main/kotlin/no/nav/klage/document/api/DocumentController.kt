@@ -2,6 +2,7 @@ package no.nav.klage.document.api
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.klage.document.api.views.DocumentUpdateInput
 import no.nav.klage.document.api.views.DocumentVersionView
 import no.nav.klage.document.api.views.DocumentView
 import no.nav.klage.document.config.SecurityConfiguration.Companion.ISSUER_AAD
@@ -49,11 +50,18 @@ class DocumentController(
     @PutMapping("/{documentId}")
     fun updateDocument(
         @PathVariable("documentId") documentId: UUID,
-        @RequestBody json: String
+        @RequestBody(required = false) json: String?,
+        @RequestBody(required = false) input: DocumentUpdateInput?,
     ): DocumentView {
+        val jsonToUse = input?.json ?: json!!
+
         log("updateDocument called with id $documentId")
-        secureLogger.debug("updateDocument with id {}: received json: {}", documentId, json)
-        return mapToDocumentView(documentService.updateDocument(documentId, json))
+        secureLogger.debug("updateDocument with id {}: current version: {} received json: {}", documentId, input?.currentVersion, jsonToUse)
+        return mapToDocumentView(documentService.updateDocument(
+            documentId = documentId,
+            json = jsonToUse,
+            currentVersion = input?.currentVersion,
+        ))
     }
 
     @Operation(
