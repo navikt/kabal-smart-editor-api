@@ -2,6 +2,7 @@ package no.nav.klage.document.repositories
 
 import no.nav.klage.document.domain.Comment
 import no.nav.klage.document.domain.Document
+import no.nav.klage.document.domain.DocumentVersion
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,135 +30,143 @@ class RepositoryTest {
     lateinit var testEntityManager: TestEntityManager
 
     @Autowired
+    lateinit var documentVersionRepository: DocumentVersionRepository
+
+    @Autowired
     lateinit var documentRepository: DocumentRepository
 
     @Autowired
     lateinit var commentRepository: CommentRepository
 
     @Test
-    fun `add document and comments work`() {
-
+    fun `add documentVersion and comments work`() {
         val now = LocalDateTime.now()
 
-        val document = Document(
-            json = "{}",
-            created = now,
-            modified = now
+        val document = testEntityManager.persistAndFlush(
+            Document(
+                created = now,
+                modified = now,
+            )
         )
 
-        documentRepository.save(document)
+        val documentVersion = testEntityManager.persistAndFlush(
+            DocumentVersion(
+                documentId = document.id,
+                version = 1,
+                authorNavIdent = "abc",
+                json = "{}",
+                created = now,
+                modified = now,
+            )
+        )
 
-        testEntityManager.flush()
         testEntityManager.clear()
 
-        val foundDocument = documentRepository.findById(document.id).get()
-        assertThat(foundDocument).isEqualTo(document)
+        val foundDocumentVersion = documentVersionRepository.findByDocumentId(documentId = documentVersion.documentId)
+        assertThat(foundDocumentVersion.first()).isEqualTo(documentVersion)
 
-        val comment1Parent = Comment(
-            documentId = document.id,
-            text = "my comment 1",
-            authorName = "Kalle Anka",
-            authorIdent = "Z123456",
-            created = now.plusDays(1),
-            modified = now.plusDays(1)
+        val comment1Parent = testEntityManager.persistAndFlush(
+            Comment(
+                documentId = document.id,
+                text = "my comment 1",
+                authorName = "Kalle Anka",
+                authorIdent = "Z123456",
+                created = now.plusDays(1),
+                modified = now.plusDays(1)
+            )
         )
 
-        val comment2 = Comment(
-            documentId = document.id,
-            parentCommentId = comment1Parent.id,
-            text = "my sub comment 1",
-            authorName = "Kajsa Anka",
-            authorIdent = "Z654321",
-            created = now.plusDays(2),
-            modified = now.plusDays(2)
+        val comment2 = testEntityManager.persistAndFlush(
+            Comment(
+                documentId = document.id,
+                parentCommentId = comment1Parent.id,
+                text = "my sub comment 1",
+                authorName = "Kajsa Anka",
+                authorIdent = "Z654321",
+                created = now.plusDays(2),
+                modified = now.plusDays(2)
+            )
         )
 
-        val comment3 = Comment(
-            documentId = document.id,
-            parentCommentId = comment1Parent.id,
-            text = "my sub comment 2",
-            authorName = "Kajsa Anka",
-            authorIdent = "Z654321",
-            created = now.plusDays(3),
-            modified = now.plusDays(3)
+        val comment3 = testEntityManager.persistAndFlush(
+            Comment(
+                documentId = document.id,
+                parentCommentId = comment1Parent.id,
+                text = "my sub comment 2",
+                authorName = "Kajsa Anka",
+                authorIdent = "Z654321",
+                created = now.plusDays(3),
+                modified = now.plusDays(3)
+            )
         )
 
-        commentRepository.save(comment1Parent)
-        commentRepository.save(comment2)
-        commentRepository.save(comment3)
-
-        testEntityManager.flush()
         testEntityManager.clear()
 
-        val comments = commentRepository.findByDocumentIdAndParentCommentIdIsNullOrderByCreatedAsc(document.id)
+        val comments =
+            commentRepository.findByDocumentIdAndParentCommentIdIsNullOrderByCreatedAsc(documentId = document.id)
 
         assertThat(comments.first().comments).hasSize(2)
         assertThat(comments.first().comments.first()).isEqualTo(comment2)
 
         commentRepository.deleteByDocumentId(document.id)
-        documentRepository.deleteById(document.id)
+        documentVersionRepository.deleteByDocumentId(document.id)
 
         testEntityManager.flush()
         testEntityManager.clear()
 
-        assertThat(documentRepository.findAll()).isEmpty()
+        assertThat(documentVersionRepository.findAll()).isEmpty()
     }
 
     @Test
     fun `child comments are removed with parent`() {
         val now = LocalDateTime.now()
 
-        val document = Document(
-            json = "{}",
-            created = now,
-            modified = now
+        val document = testEntityManager.persistAndFlush(
+            Document(
+                created = now,
+                modified = now,
+            )
         )
 
-        documentRepository.save(document)
+        val comment1Parent = testEntityManager.persistAndFlush(
+            Comment(
+                documentId = document.id,
+                text = "my comment 1",
+                authorName = "Kalle Anka",
+                authorIdent = "Z123456",
+                created = now.plusDays(1),
+                modified = now.plusDays(1)
+            )
+        )
 
-        testEntityManager.flush()
+        val comment2 = testEntityManager.persistAndFlush(
+            Comment(
+                documentId = document.id,
+                parentCommentId = comment1Parent.id,
+                text = "my sub comment 1",
+                authorName = "Kajsa Anka",
+                authorIdent = "Z654321",
+                created = now.plusDays(2),
+                modified = now.plusDays(2)
+            )
+        )
+
+        val comment3 = testEntityManager.persistAndFlush(
+            Comment(
+                documentId = document.id,
+                parentCommentId = comment1Parent.id,
+                text = "my sub comment 2",
+                authorName = "Kajsa Anka",
+                authorIdent = "Z654321",
+                created = now.plusDays(3),
+                modified = now.plusDays(3),
+            )
+        )
+
         testEntityManager.clear()
 
-        val foundDocument = documentRepository.findById(document.id).get()
-        assertThat(foundDocument).isEqualTo(document)
-
-        val comment1Parent = Comment(
-            documentId = document.id,
-            text = "my comment 1",
-            authorName = "Kalle Anka",
-            authorIdent = "Z123456",
-            created = now.plusDays(1),
-            modified = now.plusDays(1)
-        )
-
-        val comment2 = Comment(
-            documentId = document.id,
-            parentCommentId = comment1Parent.id,
-            text = "my sub comment 1",
-            authorName = "Kajsa Anka",
-            authorIdent = "Z654321",
-            created = now.plusDays(2),
-            modified = now.plusDays(2)
-        )
-
-        val comment3 = Comment(
-            documentId = document.id,
-            parentCommentId = comment1Parent.id,
-            text = "my sub comment 2",
-            authorName = "Kajsa Anka",
-            authorIdent = "Z654321",
-            created = now.plusDays(3),
-            modified = now.plusDays(3)
-        )
-
-        commentRepository.save(comment1Parent)
-        commentRepository.save(comment2)
-        commentRepository.save(comment3)
-
-        testEntityManager.flush()
-        testEntityManager.clear()
-
-        val comments = commentRepository.findByDocumentIdAndParentCommentIdIsNullOrderByCreatedAsc(document.id)
+        val comments =
+            commentRepository.findByDocumentIdAndParentCommentIdIsNullOrderByCreatedAsc(documentId = document.id)
 
         assertThat(comments.first().comments).hasSize(2)
         assertThat(comments.first().comments.first()).isEqualTo(comment2)
@@ -170,6 +179,101 @@ class RepositoryTest {
 
         assertThat(commentRepository.findAll()).isEmpty()
         assertThat(documentRepository.findAll()).isEmpty()
+    }
+
+    @Test
+    fun `add and delete document versions`() {
+        val now = LocalDateTime.now()
+
+        val document = testEntityManager.persistAndFlush(
+            Document(
+                created = now,
+                modified = now,
+            )
+        )
+
+        val documentVersion = testEntityManager.persistAndFlush(
+            DocumentVersion(
+                documentId = document.id,
+                version = 1,
+                authorNavIdent = "abc",
+                json = "{}",
+                created = now,
+                modified = now,
+            )
+        )
+
+        val documentVersion2 = testEntityManager.persistAndFlush(
+            DocumentVersion(
+                documentId = document.id,
+                version = 2,
+                authorNavIdent = "abc",
+                json = "{}",
+                created = now,
+                modified = now,
+            )
+        )
+
+        testEntityManager.clear()
+
+        val founddocumentVersions = documentVersionRepository.findByDocumentId(documentId = document.id)
+        assertThat(founddocumentVersions).hasSize(2)
+
+        documentVersionRepository.deleteByDocumentId(documentId = document.id)
+
+        testEntityManager.flush()
+        testEntityManager.clear()
+
+        assertThat(documentVersionRepository.findAll()).isEmpty()
+    }
+
+    @Test
+    fun `find next document version number`() {
+        val now = LocalDateTime.now()
+
+        val document = testEntityManager.persistAndFlush(
+            Document(
+                created = now,
+                modified = now,
+            )
+        )
+
+        testEntityManager.persistAndFlush(
+            DocumentVersion(
+                documentId = document.id,
+                version = 1,
+                authorNavIdent = "abc",
+                json = "{}",
+                created = now,
+                modified = now,
+            )
+        )
+        testEntityManager.persistAndFlush(
+            DocumentVersion(
+                documentId = document.id,
+                version = 3,
+                authorNavIdent = "abc",
+                json = "{}",
+                created = now,
+                modified = now,
+            )
+        )
+        testEntityManager.persistAndFlush(
+            DocumentVersion(
+                documentId = document.id,
+                version = 2,
+                authorNavIdent = "abc",
+                json = "{}",
+                created = now,
+                modified = now,
+            )
+        )
+
+        testEntityManager.clear()
+
+        val latestVersionNumber = documentVersionRepository.findLatestVersionNumber(documentId = document.id)
+
+        assertThat(latestVersionNumber).isEqualTo(3)
     }
 
 }

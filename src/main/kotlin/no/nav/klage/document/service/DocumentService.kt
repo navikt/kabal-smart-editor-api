@@ -1,10 +1,14 @@
 package no.nav.klage.document.service
 
-import no.nav.klage.document.clients.KabalJsonToPdfClient
 import no.nav.klage.document.domain.Document
-import no.nav.klage.document.domain.PDFDocument
+import no.nav.klage.document.domain.DocumentVersion
+import no.nav.klage.document.domain.DocumentVersionId
 import no.nav.klage.document.repositories.CommentRepository
 import no.nav.klage.document.repositories.DocumentRepository
+import no.nav.klage.document.repositories.DocumentVersionRepository
+import no.nav.klage.document.util.TokenUtil
+import no.nav.klage.document.util.getLogger
+import no.nav.klage.document.util.getSecureLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -13,40 +17,74 @@ import java.util.*
 @Service
 @Transactional
 class DocumentService(
-    private val documentRepository: DocumentRepository,
+    private val documentVersionRepository: DocumentVersionRepository,
     private val commentRepository: CommentRepository,
-    private val kabalJsonToPdfClient: KabalJsonToPdfClient
+    private val documentRepository: DocumentRepository,
+    private val tokenUtil: TokenUtil,
 ) {
 
-    fun createDocument(json: String): Document {
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
+    }
+
+    fun createDocument(json: String): DocumentVersion {
         val now = LocalDateTime.now()
-        return documentRepository.save(
+
+        val document = documentRepository.save(
             Document(
-                json = json,
                 created = now,
-                modified = now
+                modified = now,
+            )
+        )
+
+        return documentVersionRepository.save(
+            DocumentVersion(
+                documentId = document.id,
+                version = 1,
+                json = json,
+                authorNavIdent = tokenUtil.getIdent(),
+                created = now,
+                modified = now,
             )
         )
     }
 
-    fun updateDocument(documentId: UUID, json: String): Document {
-        val document = documentRepository.getReferenceById(documentId)
-        document.json = json
-        document.modified = LocalDateTime.now()
-        return document
+    fun updateDocument(documentId: UUID, json: String, currentVersion: Int?): DocumentVersion {
+        val now = LocalDateTime.now()
+        val latestVersionNumber = documentVersionRepository.findLatestVersionNumber(documentId = documentId)
+
+        if (currentVersion != null && latestVersionNumber != currentVersion) {
+            logger.warn("latest version {} does not match clients current version {}", latestVersionNumber, currentVersion)
+        }
+
+        val documentVersion = documentVersionRepository.findByDocumentIdAndVersion(documentId = documentId, version = latestVersionNumber)
+        return documentVersionRepository.save(
+            DocumentVersion(
+                documentId = documentVersion.documentId,
+                version = documentVersion.version + 1,
+                json = json,
+                created = now,
+                modified = now,
+                authorNavIdent = tokenUtil.getIdent()
+            )
+        )
     }
 
-    fun getDocument(documentId: UUID): Document {
-        return documentRepository.getReferenceById(documentId)
-    }
-
-    fun getDocumentAsPDF(documentId: UUID): PDFDocument {
-        return kabalJsonToPdfClient.getPDFDocument(documentRepository.getReferenceById(documentId).json)
+    fun getDocument(documentId: UUID, version: Int?): DocumentVersion {
+        val versionToUse = version ?: documentVersionRepository.findLatestVersionNumber(documentId = documentId)
+        return documentVersionRepository.findById(DocumentVersionId(documentId = documentId, version = versionToUse)).get()
     }
 
     fun deleteDocument(documentId: UUID) {
         commentRepository.deleteByDocumentId(documentId)
+        documentVersionRepository.deleteByDocumentId(documentId)
         documentRepository.deleteById(documentId)
+    }
+
+    fun getDocumentVersions(documentId: UUID): List<DocumentVersion> {
+        return documentVersionRepository.findByDocumentId(documentId = documentId).sortedBy { it.version }
     }
 
 }
