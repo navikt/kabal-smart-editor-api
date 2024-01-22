@@ -120,7 +120,7 @@ class DocumentController(
 
     private fun log(message: String) {
         logger.debug(message)
-        secureLogger.debug("{}. On-behalf-of: {}", message, tokenUtil.getIdent())
+        secureLogger.debug("{}. On-behalf-of: {}", message, tokenUtil.getIdentNullable())
     }
 
 }
