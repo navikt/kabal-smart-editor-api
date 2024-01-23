@@ -56,10 +56,25 @@ class DocumentService(
         val latestVersionNumber = documentVersionRepository.findLatestVersionNumber(documentId = documentId)
 
         if (currentVersion != null && latestVersionNumber != currentVersion) {
-            logger.warn("latest version {} does not match clients current version {}", latestVersionNumber, currentVersion)
+            logger.warn(
+                "latest db version {} and current client version {} does not match. Author: {}, documentId: {}",
+                latestVersionNumber,
+                currentVersion,
+                tokenUtil.getIdentNullable(),
+                documentId,
+            )
+        } else {
+            logger.debug(
+                "latest db version {} and current client version {} matches. Author: {}, documentId: {}",
+                latestVersionNumber,
+                currentVersion,
+                tokenUtil.getIdentNullable(),
+                documentId,
+            )
         }
 
-        val documentVersion = documentVersionRepository.findByDocumentIdAndVersion(documentId = documentId, version = latestVersionNumber)
+        val documentVersion =
+            documentVersionRepository.findByDocumentIdAndVersion(documentId = documentId, version = latestVersionNumber)
         return documentVersionRepository.save(
             DocumentVersion(
                 documentId = documentVersion.documentId,
@@ -74,7 +89,8 @@ class DocumentService(
 
     fun getDocument(documentId: UUID, version: Int?): DocumentVersion {
         val versionToUse = version ?: documentVersionRepository.findLatestVersionNumber(documentId = documentId)
-        return documentVersionRepository.findById(DocumentVersionId(documentId = documentId, version = versionToUse)).get()
+        return documentVersionRepository.findById(DocumentVersionId(documentId = documentId, version = versionToUse))
+            .get()
     }
 
     fun deleteDocument(documentId: UUID) {
