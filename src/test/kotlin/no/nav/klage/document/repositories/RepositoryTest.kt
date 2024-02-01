@@ -33,6 +33,9 @@ class RepositoryTest {
     lateinit var documentVersionRepository: DocumentVersionRepository
 
     @Autowired
+    lateinit var latestDocumentVersionRepository: LatestDocumentVersionRepository
+
+    @Autowired
     lateinit var documentRepository: DocumentRepository
 
     @Autowired
@@ -192,7 +195,7 @@ class RepositoryTest {
             )
         )
 
-        val documentVersion = testEntityManager.persistAndFlush(
+        testEntityManager.persistAndFlush(
             DocumentVersion(
                 documentId = document.id,
                 version = 1,
@@ -203,7 +206,7 @@ class RepositoryTest {
             )
         )
 
-        val documentVersion2 = testEntityManager.persistAndFlush(
+        testEntityManager.persistAndFlush(
             DocumentVersion(
                 documentId = document.id,
                 version = 2,
@@ -228,52 +231,59 @@ class RepositoryTest {
     }
 
     @Test
-    fun `find next document version number`() {
+    fun `latest version number is recorded`() {
         val now = LocalDateTime.now()
 
-        val document = testEntityManager.persistAndFlush(
+        val document1 = testEntityManager.persistAndFlush(
             Document(
                 created = now,
                 modified = now,
             )
         )
 
-        testEntityManager.persistAndFlush(
-            DocumentVersion(
-                documentId = document.id,
-                version = 1,
-                authorNavIdent = "abc",
-                json = "{}",
+        val document2 = testEntityManager.persistAndFlush(
+            Document(
                 created = now,
                 modified = now,
             )
         )
-        testEntityManager.persistAndFlush(
-            DocumentVersion(
-                documentId = document.id,
-                version = 3,
-                authorNavIdent = "abc",
-                json = "{}",
-                created = now,
-                modified = now,
+
+        val numberOfDocumenVersionsToCreateDocument1 = 10
+        val numberOfDocumenVersionsToCreateDocument2 = 15
+
+        repeat(numberOfDocumenVersionsToCreateDocument1) {
+            testEntityManager.persistAndFlush(
+                DocumentVersion(
+                    documentId = document1.id,
+                    version = it + 1,
+                    authorNavIdent = "abc",
+                    json = "{}",
+                    created = now,
+                    modified = now,
+                )
             )
-        )
-        testEntityManager.persistAndFlush(
-            DocumentVersion(
-                documentId = document.id,
-                version = 2,
-                authorNavIdent = "abc",
-                json = "{}",
-                created = now,
-                modified = now,
+        }
+
+        repeat(numberOfDocumenVersionsToCreateDocument2) {
+            testEntityManager.persistAndFlush(
+                DocumentVersion(
+                    documentId = document2.id,
+                    version = it + 1,
+                    authorNavIdent = "abc",
+                    json = "{}",
+                    created = now,
+                    modified = now,
+                )
             )
-        )
+        }
 
         testEntityManager.clear()
 
-        val latestVersionNumber = documentVersionRepository.findLatestVersionNumber(documentId = document.id)
+        val latestVersionNumberDocument1 = latestDocumentVersionRepository.findById(document1.id).get().currentVersion
+        val latestVersionNumberDocument2 = latestDocumentVersionRepository.findById(document2.id).get().currentVersion
 
-        assertThat(latestVersionNumber).isEqualTo(3)
+        assertThat(latestVersionNumberDocument1).isEqualTo(numberOfDocumenVersionsToCreateDocument1)
+        assertThat(latestVersionNumberDocument2).isEqualTo(numberOfDocumenVersionsToCreateDocument2)
     }
 
 }

@@ -53,12 +53,35 @@ class DocumentController(
         @RequestBody(required = false) input: DocumentUpdateInput,
     ): DocumentView {
         log("updateDocument called with id $documentId")
-        secureLogger.debug("updateDocument with id {}: current version: {} received json: {}", documentId, input.currentVersion, input.json)
-        return mapToDocumentView(documentService.updateDocument(
-            documentId = documentId,
-            json = input.json,
-            currentVersion = input.currentVersion,
-        ))
+        secureLogger.debug(
+            "updateDocument with id {}: current FE version: {} received json: {}",
+            documentId,
+            input.currentVersion,
+            input.json
+        )
+
+        var mapToDocumentView: DocumentView
+        try {
+            mapToDocumentView = mapToDocumentView(
+                documentService.updateDocument(
+                    documentId = documentId,
+                    json = input.json,
+                    currentVersion = input.currentVersion,
+                )
+            )
+        } catch (e: Exception) {
+            logger.warn("Failed to update document $documentId. Trying one more time.", e)
+
+            mapToDocumentView = mapToDocumentView(
+                documentService.updateDocument(
+                    documentId = documentId,
+                    json = input.json,
+                    currentVersion = input.currentVersion,
+                )
+            )
+        }
+
+        return mapToDocumentView
     }
 
     @Operation(

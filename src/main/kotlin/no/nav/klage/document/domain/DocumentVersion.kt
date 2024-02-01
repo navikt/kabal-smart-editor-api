@@ -1,10 +1,6 @@
 package no.nav.klage.document.domain
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.IdClass
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import java.time.LocalDateTime
 import java.util.*
 
