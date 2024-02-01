@@ -60,9 +60,8 @@ class DocumentController(
             input.json
         )
 
-        var mapToDocumentView: DocumentView
-        try {
-            mapToDocumentView = mapToDocumentView(
+        return try {
+            mapToDocumentView(
                 documentService.updateDocument(
                     documentId = documentId,
                     json = input.json,
@@ -72,7 +71,7 @@ class DocumentController(
         } catch (e: Exception) {
             logger.warn("Failed to update document $documentId. Trying one more time.", e)
 
-            mapToDocumentView = mapToDocumentView(
+            mapToDocumentView(
                 documentService.updateDocument(
                     documentId = documentId,
                     json = input.json,
@@ -80,8 +79,6 @@ class DocumentController(
                 )
             )
         }
-
-        return mapToDocumentView
     }
 
     @Operation(
