@@ -6,6 +6,7 @@ import no.nav.klage.document.domain.DocumentVersionId
 import no.nav.klage.document.repositories.CommentRepository
 import no.nav.klage.document.repositories.DocumentRepository
 import no.nav.klage.document.repositories.DocumentVersionRepository
+import no.nav.klage.document.repositories.LatestDocumentVersionRepository
 import no.nav.klage.document.util.TokenUtil
 import no.nav.klage.document.util.getLogger
 import no.nav.klage.document.util.getSecureLogger
@@ -20,6 +21,7 @@ class DocumentService(
     private val documentVersionRepository: DocumentVersionRepository,
     private val commentRepository: CommentRepository,
     private val documentRepository: DocumentRepository,
+    private val latestDocumentRepository: LatestDocumentVersionRepository,
     private val tokenUtil: TokenUtil,
 ) {
 
@@ -53,7 +55,7 @@ class DocumentService(
 
     fun updateDocument(documentId: UUID, json: String, currentVersion: Int?): DocumentVersion {
         val now = LocalDateTime.now()
-        val latestVersionNumber = documentVersionRepository.findLatestVersionNumber(documentId = documentId)
+        val latestVersionNumber = latestDocumentRepository.findById(documentId).get().currentVersion
 
         if (currentVersion != null && latestVersionNumber != currentVersion) {
             logger.warn(
@@ -74,11 +76,16 @@ class DocumentService(
         }
 
         val documentVersion =
-            documentVersionRepository.findByDocumentIdAndVersion(documentId = documentId, version = latestVersionNumber)
+            documentVersionRepository.findById(
+                DocumentVersionId(
+                    documentId = documentId,
+                    version = latestVersionNumber
+                )
+            ).get()
         return documentVersionRepository.save(
             DocumentVersion(
                 documentId = documentVersion.documentId,
-                version = documentVersion.version + 1,
+                version = latestVersionNumber + 1,
                 json = json,
                 created = now,
                 modified = now,
@@ -88,14 +95,19 @@ class DocumentService(
     }
 
     fun getDocument(documentId: UUID, version: Int?): DocumentVersion {
-        val versionToUse = version ?: documentVersionRepository.findLatestVersionNumber(documentId = documentId)
-        return documentVersionRepository.findById(DocumentVersionId(documentId = documentId, version = versionToUse))
-            .get()
+        val versionToUse = version ?: latestDocumentRepository.findById(documentId).get().currentVersion
+        return documentVersionRepository.findById(
+            DocumentVersionId(
+                documentId = documentId,
+                version = versionToUse
+            )
+        ).get()
     }
 
     fun deleteDocument(documentId: UUID) {
         commentRepository.deleteByDocumentId(documentId)
         documentVersionRepository.deleteByDocumentId(documentId)
+        latestDocumentRepository.deleteById(documentId)
         documentRepository.deleteById(documentId)
     }
 
