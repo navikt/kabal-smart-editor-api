@@ -19,7 +19,7 @@ class TokenUtil(
         getIdentNullable() ?: throw RuntimeException("NAVident not found in token")
 
     fun getIdentNullable(): String? =
-        tokenValidationContextHolder.tokenValidationContext.getJwtToken(ISSUER_AAD)
-            .jwtTokenClaims?.get("NAVident")?.toString()
+        tokenValidationContextHolder.getTokenValidationContext().getJwtToken(ISSUER_AAD)
+            ?.jwtTokenClaims?.get("NAVident")?.toString()
 
 }

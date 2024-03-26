@@ -165,7 +165,7 @@ class CommentsController(
     }
 
     fun getIdent(): String? =
-        tokenValidationContextHolder.tokenValidationContext.getJwtToken(ISSUER_AAD)
-            .jwtTokenClaims?.get("NAVident")?.toString()
+        tokenValidationContextHolder.getTokenValidationContext().getJwtToken(ISSUER_AAD)
+            ?.jwtTokenClaims?.get("NAVident")?.toString()
 
 }

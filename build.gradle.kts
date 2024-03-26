@@ -12,7 +12,7 @@ repositories {
 }
 
 plugins {
-    val kotlinVersion = "1.8.0"
+    val kotlinVersion = "1.9.23"
     id("org.springframework.boot") version "3.2.4"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
@@ -54,12 +54,12 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_21
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
+        jvmTarget = "21"
     }
 }
 
