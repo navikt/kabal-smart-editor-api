@@ -4,7 +4,7 @@ val mockkVersion = "1.13.10"
 val logstashVersion = "7.4"
 val testContainersVersion = "1.19.7"
 val springDocVersion = "2.4.0"
-val tokenValidationVersion = "4.1.3"
+val tokenValidationVersion = "4.1.4"
 val kotlinVersion = "1.9.23"
 
 repositories {
