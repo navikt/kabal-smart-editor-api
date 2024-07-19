@@ -1,5 +1,6 @@
 package no.nav.klage.document.service
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.document.domain.Document
 import no.nav.klage.document.domain.DocumentVersion
 import no.nav.klage.document.domain.DocumentVersionId
@@ -23,12 +24,24 @@ class DocumentService(
     private val documentRepository: DocumentRepository,
     private val latestDocumentRepository: LatestDocumentVersionRepository,
     private val tokenUtil: TokenUtil,
+
 ) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
+    }
+
+    //find and log all documents with invalid json
+    fun logDocumentsWithInvalidJson() {
+        documentVersionRepository.findAll().forEach {
+            try {
+                jacksonObjectMapper().readTree(it.json)
+            } catch (e: Exception) {
+                logger.error("Document with id ${it.documentId} and version ${it.version} has invalid json: ${it.json}")
+            }
+        }
     }
 
     fun createDocument(json: String): DocumentVersion {
