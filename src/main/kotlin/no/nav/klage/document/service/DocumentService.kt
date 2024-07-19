@@ -25,7 +25,7 @@ class DocumentService(
     private val latestDocumentRepository: LatestDocumentVersionRepository,
     private val tokenUtil: TokenUtil,
 
-) {
+    ) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -35,13 +35,22 @@ class DocumentService(
 
     //find and log all documents with invalid json
     fun logDocumentsWithInvalidJson() {
+        logger.debug("Checking for documents with invalid json")
+        var counter = 0
         documentVersionRepository.findAll().forEach {
             try {
                 jacksonObjectMapper().readTree(it.json)
             } catch (e: Exception) {
-                logger.error("Document with id ${it.documentId} and version ${it.version} has invalid json: ${it.json}")
+                counter++
+                logger.debug(
+                    "Document with id {} and version {}, modified {} has invalid json.",
+                    it.documentId,
+                    it.version,
+                    it.modified,
+                )
             }
         }
+        logger.debug("Found {} documents with invalid json", counter)
     }
 
     fun createDocument(json: String): DocumentVersion {
