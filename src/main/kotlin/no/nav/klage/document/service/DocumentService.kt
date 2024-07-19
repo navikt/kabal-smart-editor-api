@@ -36,12 +36,14 @@ class DocumentService(
     //find and log all documents with invalid json
     fun logDocumentsWithInvalidJson() {
         logger.debug("Checking for documents with invalid json")
-        var counter = 0
+        var counterFailed = 0
+        var counterOK = 0
         documentVersionRepository.findAll().forEach {
             try {
+                counterOK++
                 jacksonObjectMapper().readTree(it.json)
             } catch (e: Exception) {
-                counter++
+                counterFailed++
                 logger.debug(
                     "Document with id {} and version {}, modified {} has invalid json.",
                     it.documentId,
@@ -50,7 +52,7 @@ class DocumentService(
                 )
             }
         }
-        logger.debug("Found {} documents with invalid json", counter)
+        logger.debug("Found {} OK documents, and {} documents with invalid json", counterOK, counterFailed)
     }
 
     fun createDocument(json: String): DocumentVersion {
