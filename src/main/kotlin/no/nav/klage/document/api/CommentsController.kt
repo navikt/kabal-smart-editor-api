@@ -156,7 +156,8 @@ class CommentsController(
             ),
             comments = comment.comments.map { mapCommentToView(it) },
             created = comment.created,
-            modified = comment.modified
+            modified = comment.modified,
+            parentId = comment.parentCommentId,
         )
 
     private fun log(message: String) {
