@@ -141,9 +141,9 @@ class CommentsController(
         @PathVariable("documentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID,
         @RequestBody deleteCommentInput: DeleteCommentInput
-    ) {
+    ): CommentView {
         log("deleteCommentWithPossibleThread called with id $documentId and commentId $commentId")
-        commentService.deleteComment(commentId = commentId, loggedInIdent = getIdent()!!, behandlingTildeltIdent = deleteCommentInput.behandlingTildeltIdent)
+        return mapCommentToView(commentService.deleteComment(commentId = commentId, loggedInIdent = getIdent()!!, behandlingTildeltIdent = deleteCommentInput.behandlingTildeltIdent))
     }
 
     private fun mapCommentToView(comment: Comment): CommentView =
@@ -156,7 +156,8 @@ class CommentsController(
             ),
             comments = comment.comments.map { mapCommentToView(it) },
             created = comment.created,
-            modified = comment.modified
+            modified = comment.modified,
+            parentId = comment.parentCommentId,
         )
 
     private fun log(message: String) {
