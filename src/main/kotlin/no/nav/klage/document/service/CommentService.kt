@@ -1,5 +1,6 @@
 package no.nav.klage.document.service
 
+import no.nav.klage.document.api.views.CommentView
 import no.nav.klage.document.domain.Comment
 import no.nav.klage.document.exceptions.MissingAccessException
 import no.nav.klage.document.repositories.CommentRepository
@@ -69,12 +70,14 @@ class CommentService(private val commentRepository: CommentRepository) {
         commentId: UUID,
         loggedInIdent: String,
         behandlingTildeltIdent: String?
-    ) {
+    ): Comment {
         val loggedInIsDocumentOwner = loggedInIdent == behandlingTildeltIdent
         val comment = commentRepository.getReferenceById(commentId)
         if (!loggedInIsDocumentOwner && comment.authorIdent != loggedInIdent) {
             throw MissingAccessException("Not allowed to delete others comment when not document owner")
         }
         commentRepository.delete(comment)
+
+        return comment
     }
 }
