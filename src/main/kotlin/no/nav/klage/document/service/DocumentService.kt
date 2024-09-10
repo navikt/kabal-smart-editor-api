@@ -31,7 +31,7 @@ class DocumentService(
         private val secureLogger = getSecureLogger()
     }
 
-    fun createDocument(json: String): DocumentVersion {
+    fun createDocument(json: String, data: String?): DocumentVersion {
         val now = LocalDateTime.now()
 
         val document = documentRepository.save(
@@ -46,6 +46,7 @@ class DocumentService(
                 documentId = document.id,
                 version = 1,
                 json = json,
+                data = data,
                 authorNavIdent = tokenUtil.getIdent(),
                 created = now,
                 modified = now,
@@ -53,7 +54,7 @@ class DocumentService(
         )
     }
 
-    fun updateDocument(documentId: UUID, json: String, currentVersion: Int?): DocumentVersion {
+    fun updateDocument(documentId: UUID, json: String, data: String?, currentVersion: Int?): DocumentVersion {
         val now = LocalDateTime.now()
         val latestVersionNumber = latestDocumentRepository.findById(documentId).get().currentVersion
 
@@ -87,6 +88,7 @@ class DocumentService(
                 documentId = documentVersion.documentId,
                 version = latestVersionNumber + 1,
                 json = json,
+                data = data,
                 created = now,
                 modified = now,
                 authorNavIdent = tokenUtil.getIdent()

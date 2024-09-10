@@ -5,6 +5,7 @@ import java.util.*
 
 data class DocumentView(
     val json: String,
+    val data: String?,
     val documentId: UUID,
     val id: UUID,
     val version: Int,

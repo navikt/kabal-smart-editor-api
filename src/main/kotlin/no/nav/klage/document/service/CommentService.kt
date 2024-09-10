@@ -1,6 +1,5 @@
 package no.nav.klage.document.service
 
-import no.nav.klage.document.api.views.CommentView
 import no.nav.klage.document.domain.Comment
 import no.nav.klage.document.exceptions.MissingAccessException
 import no.nav.klage.document.repositories.CommentRepository

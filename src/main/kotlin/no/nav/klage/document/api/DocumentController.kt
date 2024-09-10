@@ -36,11 +36,11 @@ class DocumentController(
     )
     @PostMapping("")
     fun createDocument(
-        @RequestBody json: String
+        @RequestBody input: DocumentUpdateInput,
     ): DocumentView {
         log("createDocument")
-        secureLogger.debug("createDocument: received json: {}", json)
-        return mapToDocumentView(documentService.createDocument(json))
+        secureLogger.debug("createDocument: received json: {}", input.json)
+        return mapToDocumentView(documentService.createDocument(json = input.json, data = input.data))
     }
 
     @Operation(
@@ -50,7 +50,7 @@ class DocumentController(
     @PutMapping("/{documentId}")
     fun updateDocument(
         @PathVariable("documentId") documentId: UUID,
-        @RequestBody(required = false) input: DocumentUpdateInput,
+        @RequestBody input: DocumentUpdateInput,
     ): DocumentView {
         log("updateDocument called with id $documentId")
         secureLogger.debug(
@@ -65,6 +65,7 @@ class DocumentController(
                 documentService.updateDocument(
                     documentId = documentId,
                     json = input.json,
+                    data = input.data,
                     currentVersion = input.currentVersion,
                 )
             )
@@ -75,6 +76,7 @@ class DocumentController(
                 documentService.updateDocument(
                     documentId = documentId,
                     json = input.json,
+                    data = input.data,
                     currentVersion = input.currentVersion,
                 )
             )
@@ -124,6 +126,7 @@ class DocumentController(
             documentId = documentVersion.documentId,
             version = documentVersion.version,
             json = documentVersion.json,
+            data = documentVersion.data,
             authorNavIdent = documentVersion.authorNavIdent,
             created = documentVersion.created,
             modified = documentVersion.modified

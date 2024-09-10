@@ -58,6 +58,7 @@ class RepositoryTest {
                 version = 1,
                 authorNavIdent = "abc",
                 json = "{}",
+                data = "{}",
                 created = now,
                 modified = now,
             )
@@ -201,6 +202,7 @@ class RepositoryTest {
                 version = 1,
                 authorNavIdent = "abc",
                 json = "{}",
+                data = "{}",
                 created = now,
                 modified = now,
             )
@@ -212,6 +214,7 @@ class RepositoryTest {
                 version = 2,
                 authorNavIdent = "abc",
                 json = "{}",
+                data = "{}",
                 created = now,
                 modified = now,
             )
@@ -258,6 +261,7 @@ class RepositoryTest {
                     version = it + 1,
                     authorNavIdent = "abc",
                     json = "{}",
+                    data = "{}",
                     created = now,
                     modified = now,
                 )
@@ -271,6 +275,7 @@ class RepositoryTest {
                     version = it + 1,
                     authorNavIdent = "abc",
                     json = "{}",
+                    data = "{}",
                     created = now,
                     modified = now,
                 )
