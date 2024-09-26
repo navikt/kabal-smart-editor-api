@@ -12,7 +12,7 @@ spec:
   image: {{image}}
   observability:
     autoInstrumentation:
-      enabled: false
+      enabled: true
       runtime: java
   gcp:
     sqlInstances:
