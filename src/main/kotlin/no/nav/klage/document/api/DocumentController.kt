@@ -7,6 +7,7 @@ import no.nav.klage.document.api.views.DocumentVersionView
 import no.nav.klage.document.api.views.DocumentView
 import no.nav.klage.document.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.document.domain.DocumentVersion
+import no.nav.klage.document.domain.ShortDocumentVersion
 import no.nav.klage.document.service.DocumentService
 import no.nav.klage.document.util.TokenUtil
 import no.nav.klage.document.util.getLogger
@@ -132,7 +133,7 @@ class DocumentController(
             modified = documentVersion.modified
         )
 
-    private fun mapToDocumentVersionView(documentVersion: DocumentVersion): DocumentVersionView =
+    private fun mapToDocumentVersionView(documentVersion: ShortDocumentVersion): DocumentVersionView =
         DocumentVersionView(
             documentId = documentVersion.documentId,
             version = documentVersion.version,

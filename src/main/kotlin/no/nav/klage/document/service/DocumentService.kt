@@ -3,6 +3,7 @@ package no.nav.klage.document.service
 import no.nav.klage.document.domain.Document
 import no.nav.klage.document.domain.DocumentVersion
 import no.nav.klage.document.domain.DocumentVersionId
+import no.nav.klage.document.domain.ShortDocumentVersion
 import no.nav.klage.document.repositories.CommentRepository
 import no.nav.klage.document.repositories.DocumentRepository
 import no.nav.klage.document.repositories.DocumentVersionRepository
@@ -113,8 +114,8 @@ class DocumentService(
         documentRepository.deleteById(documentId)
     }
 
-    fun getDocumentVersions(documentId: UUID): List<DocumentVersion> {
-        return documentVersionRepository.findByDocumentId(documentId = documentId).sortedBy { it.version }
+    fun getDocumentVersions(documentId: UUID): List<ShortDocumentVersion> {
+        return documentVersionRepository.findVersionsByDocumentId(documentId = documentId)
     }
 
 }
