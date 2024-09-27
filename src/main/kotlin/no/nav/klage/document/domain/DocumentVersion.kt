@@ -14,8 +14,6 @@ class DocumentVersion(
     val version: Int,
     @Column(name = "json")
     var json: String,
-    @Column(name = "data")
-    var data: String?,
     @Column(name = "created")
     val created: LocalDateTime,
     @Column(name = "modified")
@@ -40,7 +38,7 @@ class DocumentVersion(
     }
 
     override fun toString(): String {
-        return "DocumentVersion(documentId=$documentId, version=$version, json='$json', data=$data, created=$created, modified=$modified, authorNavIdent='$authorNavIdent')"
+        return "DocumentVersion(documentId=$documentId, version=$version, json='$json', created=$created, modified=$modified, authorNavIdent='$authorNavIdent')"
     }
 
 }

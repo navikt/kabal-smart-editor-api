@@ -6,8 +6,6 @@ import no.nav.klage.document.api.views.DocumentUpdateInput
 import no.nav.klage.document.api.views.DocumentVersionView
 import no.nav.klage.document.api.views.DocumentView
 import no.nav.klage.document.config.SecurityConfiguration.Companion.ISSUER_AAD
-import no.nav.klage.document.domain.DocumentVersion
-import no.nav.klage.document.domain.ShortDocumentVersion
 import no.nav.klage.document.service.DocumentService
 import no.nav.klage.document.util.TokenUtil
 import no.nav.klage.document.util.getLogger
@@ -41,7 +39,7 @@ class DocumentController(
     ): DocumentView {
         log("createDocument")
         secureLogger.debug("createDocument: received json: {}", input.json)
-        return mapToDocumentView(documentService.createDocument(json = input.json, data = input.data))
+        return documentService.createDocument(json = input.json, data = input.data)
     }
 
     @Operation(
@@ -62,24 +60,20 @@ class DocumentController(
         )
 
         return try {
-            mapToDocumentView(
-                documentService.updateDocument(
-                    documentId = documentId,
-                    json = input.json,
-                    data = input.data,
-                    currentVersion = input.currentVersion,
-                )
+            documentService.updateDocument(
+                documentId = documentId,
+                json = input.json,
+                data = input.data,
+                currentVersion = input.currentVersion,
             )
+
         } catch (e: Exception) {
             logger.warn("Failed to update document $documentId. Trying one more time.", e)
-
-            mapToDocumentView(
-                documentService.updateDocument(
-                    documentId = documentId,
-                    json = input.json,
-                    data = input.data,
-                    currentVersion = input.currentVersion,
-                )
+            documentService.updateDocument(
+                documentId = documentId,
+                json = input.json,
+                data = input.data,
+                currentVersion = input.currentVersion,
             )
         }
     }
@@ -94,7 +88,7 @@ class DocumentController(
         @PathVariable("version", required = false) version: Int?,
     ): DocumentView {
         log("getDocument called with id $documentId and version $version")
-        return mapToDocumentView(documentService.getDocument(documentId = documentId, version = version))
+        return documentService.getDocument(documentId = documentId, version = version)
     }
 
     @Operation(
@@ -114,33 +108,8 @@ class DocumentController(
     @GetMapping("/{documentId}/versions")
     fun getDocumentVersions(@PathVariable("documentId") documentId: UUID): List<DocumentVersionView> {
         log("getDocumentVersions called with id $documentId")
-        val documentVersions = documentService.getDocumentVersions(documentId = documentId)
-
-        return documentVersions.map {
-            mapToDocumentVersionView(it)
-        }
+        return documentService.getDocumentVersions(documentId = documentId)
     }
-
-    private fun mapToDocumentView(documentVersion: DocumentVersion): DocumentView =
-        DocumentView(
-            id = documentVersion.documentId,
-            documentId = documentVersion.documentId,
-            version = documentVersion.version,
-            json = documentVersion.json,
-            data = documentVersion.data,
-            authorNavIdent = documentVersion.authorNavIdent,
-            created = documentVersion.created,
-            modified = documentVersion.modified
-        )
-
-    private fun mapToDocumentVersionView(documentVersion: ShortDocumentVersion): DocumentVersionView =
-        DocumentVersionView(
-            documentId = documentVersion.documentId,
-            version = documentVersion.version,
-            authorNavIdent = documentVersion.authorNavIdent,
-            created = documentVersion.created,
-            modified = documentVersion.modified
-        )
 
     private fun log(message: String) {
         logger.debug(message)

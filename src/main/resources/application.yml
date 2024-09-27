@@ -7,12 +7,8 @@ spring:
     throw-exception-if-no-handler-found: true
   lifecycle:
     timeout-per-shutdown-phase: 20s
-  servlet:
-    multipart:
-      max-request-size: 8MB
-      max-file-size: 8MB
   codec:
-    max-in-memory-size: 16MB
+    max-in-memory-size: 32MB
   datasource:
     url: jdbc:postgresql://${NAIS_DATABASE_KABAL_SMART_EDITOR_API_KABAL_SMART_EDITOR_API_HOST}:${NAIS_DATABASE_KABAL_SMART_EDITOR_API_KABAL_SMART_EDITOR_API_PORT}/${NAIS_DATABASE_KABAL_SMART_EDITOR_API_KABAL_SMART_EDITOR_API_DATABASE}
     username: ${NAIS_DATABASE_KABAL_SMART_EDITOR_API_KABAL_SMART_EDITOR_API_USERNAME}
@@ -20,7 +16,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   flyway:
     enabled: true
-    clean-on-validation-error: true
+    clean-on-validation-error: false
     schemas: flyway_history_schema,klage
   sql:
     init:
@@ -28,6 +24,8 @@ spring:
   web:
     resources:
       add-mappings: false
+  jpa:
+    open-in-view: false
 
 server:
   port: 7095
