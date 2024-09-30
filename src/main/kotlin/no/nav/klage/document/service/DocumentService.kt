@@ -89,6 +89,11 @@ class DocumentService(
                     version = latestVersionNumber
                 )
             ).get()
+
+        val document = documentRepository.findById(documentId).get()
+        document.data = data
+        document.modified = now
+
         return mapToDocumentView(
             documentVersion = documentVersionRepository.save(
                 DocumentVersion(
@@ -100,7 +105,7 @@ class DocumentService(
                     authorNavIdent = tokenUtil.getIdent()
                 )
             ),
-            document = documentRepository.findById(documentId).get()
+            document = document
         )
     }
 
