@@ -48,10 +48,10 @@ spec:
     timeout: 1
   resources:
     limits:
-      memory: 1024Mi
+      memory: 2024Mi
     requests:
-      cpu: 40m
-      memory: 256Mi
+      cpu: 80m
+      memory: 1024Mi
   ingresses:
   {{#each ingresses as |ingress|}}
     - {{ingress}}

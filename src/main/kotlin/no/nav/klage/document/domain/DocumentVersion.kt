@@ -14,8 +14,6 @@ class DocumentVersion(
     val version: Int,
     @Column(name = "json")
     var json: String,
-    @Column(name = "data")
-    var data: String?,
     @Column(name = "created")
     val created: LocalDateTime,
     @Column(name = "modified")
@@ -40,8 +38,19 @@ class DocumentVersion(
     }
 
     override fun toString(): String {
-        return "DocumentVersion(documentId=$documentId, version=$version, json='$json', data=$data, created=$created, modified=$modified, authorNavIdent='$authorNavIdent')"
+        return "DocumentVersion(documentId=$documentId, version=$version, json='$json', created=$created, modified=$modified, authorNavIdent='$authorNavIdent')"
     }
 
-
 }
+
+/**
+ * Using this when we don't need the full DocumentVersion object, just a subset of the fields.
+ * Otherwise, we would have to fetch the full object from the database and that's too much data.
+ */
+data class ShortDocumentVersion(
+    val documentId: UUID,
+    val version: Int,
+    val authorNavIdent: String,
+    val created: LocalDateTime,
+    val modified: LocalDateTime,
+)

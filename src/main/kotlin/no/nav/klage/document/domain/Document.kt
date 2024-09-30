@@ -12,6 +12,8 @@ import java.util.*
 class Document(
     @Id
     val id: UUID = UUID.randomUUID(),
+    @Column(name = "data")
+    var data: String?,
     @Column(name = "created")
     val created: LocalDateTime,
     @Column(name = "modified")
@@ -23,9 +25,7 @@ class Document(
 
         other as Document
 
-        if (id != other.id) return false
-
-        return true
+        return id == other.id
     }
 
     override fun hashCode(): Int {
