@@ -12,7 +12,6 @@ import no.nav.klage.document.repositories.DocumentVersionRepository
 import no.nav.klage.document.repositories.LatestDocumentVersionRepository
 import no.nav.klage.document.util.TokenUtil
 import no.nav.klage.document.util.getLogger
-import no.nav.klage.document.util.getSecureLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -31,7 +30,6 @@ class DocumentService(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val secureLogger = getSecureLogger()
     }
 
     fun createDocument(json: String, data: String?): DocumentView {

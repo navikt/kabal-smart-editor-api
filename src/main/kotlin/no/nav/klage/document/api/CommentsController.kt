@@ -10,7 +10,6 @@ import no.nav.klage.document.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.document.domain.Comment
 import no.nav.klage.document.service.CommentService
 import no.nav.klage.document.util.getLogger
-import no.nav.klage.document.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import org.springframework.web.bind.annotation.*
@@ -28,7 +27,6 @@ class CommentsController(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val secureLogger = getSecureLogger()
     }
 
     @Operation(
@@ -161,8 +159,7 @@ class CommentsController(
         )
 
     private fun log(message: String) {
-        logger.debug(message)
-        secureLogger.debug("{}. On-behalf-of: {}", message, getIdent())
+        logger.debug("{}. On-behalf-of: {}", message, getIdent())
     }
 
     fun getIdent(): String? =

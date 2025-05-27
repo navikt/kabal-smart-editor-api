@@ -9,7 +9,6 @@ import no.nav.klage.document.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.document.service.DocumentService
 import no.nav.klage.document.util.TokenUtil
 import no.nav.klage.document.util.getLogger
-import no.nav.klage.document.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -26,7 +25,6 @@ class DocumentController(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val secureLogger = getSecureLogger()
     }
 
     @Operation(
@@ -38,7 +36,6 @@ class DocumentController(
         @RequestBody input: DocumentUpdateInput,
     ): DocumentView {
         log("createDocument")
-        secureLogger.debug("createDocument: received json: {}", input.json)
         return documentService.createDocument(json = input.json, data = input.data)
     }
 
@@ -52,12 +49,6 @@ class DocumentController(
         @RequestBody input: DocumentUpdateInput,
     ): DocumentView {
         log("updateDocument called with id $documentId")
-        secureLogger.debug(
-            "updateDocument with id {}: current FE version: {} received json: {}",
-            documentId,
-            input.currentVersion,
-            input.json
-        )
 
         return try {
             documentService.updateDocument(
@@ -112,8 +103,7 @@ class DocumentController(
     }
 
     private fun log(message: String) {
-        logger.debug(message)
-        secureLogger.debug("{}. On-behalf-of: {}", message, tokenUtil.getIdentNullable())
+        logger.debug("{}. On-behalf-of: {}", message, tokenUtil.getIdentNullable())
     }
 
 }

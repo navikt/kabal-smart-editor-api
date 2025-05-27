@@ -1,7 +1,7 @@
 package no.nav.klage.document.config
 
 import no.nav.klage.document.exceptions.MissingAccessException
-import no.nav.klage.document.util.getSecureLogger
+import no.nav.klage.document.util.getLogger
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
@@ -14,20 +14,19 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
 
     companion object {
-        private val secureLogger = getSecureLogger()
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val ourLogger = getLogger(javaClass.enclosingClass)
     }
 
     @ExceptionHandler
     fun handleEntityNotFound(
         ex: JpaObjectRetrievalFailureException,
-        request: NativeWebRequest
     ): ProblemDetail =
         create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
     fun handleMissingAccess(
         ex: MissingAccessException,
-        request: NativeWebRequest
     ): ProblemDetail =
         create(HttpStatus.FORBIDDEN, ex)
 
@@ -48,11 +47,11 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
     private fun logError(httpStatus: HttpStatus, errorMessage: String, exception: Exception) {
         when {
             httpStatus.is5xxServerError -> {
-                secureLogger.error("Exception thrown to client: ${httpStatus.reasonPhrase}, $errorMessage", exception)
+                ourLogger.error("Exception thrown to client: ${httpStatus.reasonPhrase}, $errorMessage", exception)
             }
 
             else -> {
-                secureLogger.warn("Exception thrown to client: ${httpStatus.reasonPhrase}, $errorMessage", exception)
+                ourLogger.warn("Exception thrown to client: ${httpStatus.reasonPhrase}, $errorMessage", exception)
             }
         }
     }
