@@ -31,10 +31,10 @@ spec:
           - name: kabal-smart-editor-api
   port: 7095
   startup:
-    failureThreshold: 20
-    initialDelay: 30
+    failureThreshold: 30
+    initialDelay: 480
     path: /internal/health
-    periodSeconds: 10
+    periodSeconds: 20
     timeout: 2
   liveness:
     path: /internal/health
