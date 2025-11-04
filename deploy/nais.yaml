@@ -32,7 +32,7 @@ spec:
   port: 7095
   startup:
     failureThreshold: 30
-    initialDelay: 480
+    initialDelay: 960
     path: /internal/health
     periodSeconds: 20
     timeout: 2

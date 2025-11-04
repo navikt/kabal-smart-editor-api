@@ -34,7 +34,7 @@ jobs:
         env:
           TEAM: klage
           CLUSTER: prod-gcp
-          TIMEOUT: 20m
+          TIMEOUT: 40m
           VARS: deploy/prod.yaml
           RESOURCE: deploy/nais.yaml
           VAR: image=${{ steps.image.outputs.image }}
