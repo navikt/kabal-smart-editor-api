@@ -25,6 +25,12 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
         create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
+    fun handleEntityNotFound(
+        ex: NoSuchElementException,
+    ): ProblemDetail =
+        create(HttpStatus.NOT_FOUND, ex)
+
+    @ExceptionHandler
     fun handleMissingAccess(
         ex: MissingAccessException,
     ): ProblemDetail =
