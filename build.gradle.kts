@@ -13,7 +13,7 @@ repositories {
 
 plugins {
     val kotlinVersion = "2.3.0"
-    id("org.springframework.boot") version "4.0.0"
+    id("org.springframework.boot") version "4.0.1"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
