@@ -8,6 +8,9 @@ db_ha: true
 db_type: POSTGRES_15
 tenant: nav.no
 
+replicasMin: 2
+replicasMax: 4
+
 envs:
   - name: JAVA_OPTS
-    value: "-Xms256m -Xmx4096m"
+    value: "-Xms256m -Xmx2048m"

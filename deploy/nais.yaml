@@ -31,35 +31,35 @@ spec:
           - name: kabal-smart-editor-api
   port: 7095
   startup:
-    failureThreshold: 30
-    initialDelay: 30
+    failureThreshold: 7
+    initialDelay: 10
     path: /internal/health
-    periodSeconds: 10
+    periodSeconds: 5
     timeout: 2
   liveness:
     path: /internal/health
-    initialDelay: 20
-    timeout: 1
+    timeout: 3
     periodSeconds: 5
-    failureThreshold: 10
+    failureThreshold: 3
   readiness:
     path: /internal/health
-    initialDelay: 20
-    timeout: 1
+    timeout: 3
+    periodSeconds: 5
+    failureThreshold: 3
   resources:
     limits:
-      memory: 2024Mi
+      memory: 2048Mi
     requests:
-      cpu: 80m
+      cpu: 10m
       memory: 1024Mi
   ingresses:
   {{#each ingresses as |ingress|}}
     - {{ingress}}
   {{/each}}
   replicas:
-    min: 2
-    max: 4
-    cpuThresholdPercentage: 80
+    min: {{replicasMin}}
+    max: {{replicasMax}}
+    cpuThresholdPercentage: 90
   prometheus:
     enabled: true
     path: /internal/prometheus
