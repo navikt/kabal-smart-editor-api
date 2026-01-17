@@ -4,6 +4,7 @@ import no.nav.klage.document.domain.DocumentVersion
 import no.nav.klage.document.domain.DocumentVersionId
 import no.nav.klage.document.domain.ShortDocumentVersion
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import java.util.*
 
@@ -21,5 +22,7 @@ interface DocumentVersionRepository : JpaRepository<DocumentVersion, DocumentVer
     )
     fun findVersionsByDocumentId(documentId: UUID): List<ShortDocumentVersion>
 
+    @Modifying(clearAutomatically = true)
+    @Query("DELETE FROM DocumentVersion WHERE documentId = :documentId")
     fun deleteByDocumentId(documentId: UUID)
 }

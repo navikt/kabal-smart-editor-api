@@ -123,8 +123,8 @@ class DocumentService(
     fun deleteDocument(documentId: UUID) {
         commentRepository.deleteByDocumentId(documentId)
         documentVersionRepository.deleteByDocumentId(documentId)
-        latestDocumentRepository.deleteById(documentId)
-        documentRepository.deleteById(documentId)
+        latestDocumentRepository.deleteByDocumentId(documentId)
+        documentRepository.deleteByDocumentId(documentId)
     }
 
     fun getDocumentVersions(documentId: UUID): List<DocumentVersionView> {
