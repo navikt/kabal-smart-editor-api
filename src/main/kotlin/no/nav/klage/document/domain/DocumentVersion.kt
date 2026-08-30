@@ -1,8 +1,12 @@
 package no.nav.klage.document.domain
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.IdClass
+import jakarta.persistence.Table
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Entity
 @Table(name = "document_version", schema = "klage")
@@ -33,14 +37,10 @@ class DocumentVersion(
         return true
     }
 
-    override fun hashCode(): Int {
-        return documentId.hashCode()
-    }
+    override fun hashCode(): Int = documentId.hashCode()
 
-    override fun toString(): String {
-        return "DocumentVersion(documentId=$documentId, version=$version, json='$json', created=$created, modified=$modified, authorNavIdent='$authorNavIdent')"
-    }
-
+    override fun toString(): String =
+        "DocumentVersion(documentId=$documentId, version=$version, json='$json', created=$created, modified=$modified, authorNavIdent='$authorNavIdent')"
 }
 
 /**

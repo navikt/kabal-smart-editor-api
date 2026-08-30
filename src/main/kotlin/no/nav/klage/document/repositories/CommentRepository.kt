@@ -4,10 +4,9 @@ import no.nav.klage.document.domain.Comment
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
-import java.util.*
+import java.util.UUID
 
 interface CommentRepository : JpaRepository<Comment, UUID> {
-
     /**
      * Only find parent comments
      */
@@ -16,5 +15,4 @@ interface CommentRepository : JpaRepository<Comment, UUID> {
     @Modifying(clearAutomatically = true)
     @Query("DELETE FROM Comment WHERE documentId = :documentId")
     fun deleteByDocumentId(documentId: UUID)
-
 }

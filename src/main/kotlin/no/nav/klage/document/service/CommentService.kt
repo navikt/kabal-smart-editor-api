@@ -6,13 +6,19 @@ import no.nav.klage.document.repositories.CommentRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Service
 @Transactional
-class CommentService(private val commentRepository: CommentRepository) {
-
-    fun createComment(documentId: UUID, text: String, authorName: String, authorIdent: String): Comment {
+class CommentService(
+    private val commentRepository: CommentRepository,
+) {
+    fun createComment(
+        documentId: UUID,
+        text: String,
+        authorName: String,
+        authorIdent: String,
+    ): Comment {
         val now = LocalDateTime.now()
         return commentRepository.save(
             Comment(
@@ -21,8 +27,8 @@ class CommentService(private val commentRepository: CommentRepository) {
                 authorName = authorName,
                 authorIdent = authorIdent,
                 created = now,
-                modified = now
-            )
+                modified = now,
+            ),
         )
     }
 
@@ -31,7 +37,7 @@ class CommentService(private val commentRepository: CommentRepository) {
         parentCommentId: UUID,
         text: String,
         authorName: String,
-        authorIdent: String
+        authorIdent: String,
     ): Comment {
         val now = LocalDateTime.now()
         return commentRepository.save(
@@ -42,20 +48,21 @@ class CommentService(private val commentRepository: CommentRepository) {
                 authorName = authorName,
                 authorIdent = authorIdent,
                 created = now,
-                modified = now
-            )
+                modified = now,
+            ),
         )
     }
 
-    fun getComments(documentId: UUID): List<Comment> {
-        return commentRepository.findByDocumentIdAndParentCommentIdIsNullOrderByCreatedAsc(documentId)
-    }
+    fun getComments(documentId: UUID): List<Comment> =
+        commentRepository.findByDocumentIdAndParentCommentIdIsNullOrderByCreatedAsc(documentId)
 
-    fun getComment(commentId: UUID): Comment {
-        return commentRepository.getReferenceById(commentId)
-    }
+    fun getComment(commentId: UUID): Comment = commentRepository.getReferenceById(commentId)
 
-    fun setCommentText(commentId: UUID, text: String, loggedInIdent: String): Comment {
+    fun setCommentText(
+        commentId: UUID,
+        text: String,
+        loggedInIdent: String,
+    ): Comment {
         val comment = commentRepository.getReferenceById(commentId)
         if (comment.authorIdent != loggedInIdent) {
             throw MissingAccessException("Not allowed to modify others comment")
@@ -68,7 +75,7 @@ class CommentService(private val commentRepository: CommentRepository) {
     fun deleteComment(
         commentId: UUID,
         loggedInIdent: String,
-        behandlingTildeltIdent: String?
+        behandlingTildeltIdent: String?,
     ): Comment {
         val loggedInIsDocumentOwner = loggedInIdent == behandlingTildeltIdent
         val comment = commentRepository.getReferenceById(commentId)

@@ -13,7 +13,7 @@ import java.time.LocalDateTime
 
 @ActiveProfiles("local")
 @DataJpaTest
-class RepositoryTest: PostgresIntegrationTestBase() {
+class RepositoryTest : PostgresIntegrationTestBase() {
     @Autowired
     lateinit var testEntityManager: TestEntityManager
 
@@ -33,64 +33,69 @@ class RepositoryTest: PostgresIntegrationTestBase() {
     fun `add documentVersion and comments work`() {
         val now = LocalDateTime.now()
 
-        val document = testEntityManager.persistAndFlush(
-            Document(
-                data = "{}",
-                created = now,
-                modified = now,
+        val document =
+            testEntityManager.persistAndFlush(
+                Document(
+                    data = "{}",
+                    created = now,
+                    modified = now,
+                ),
             )
-        )
 
-        val documentVersion = testEntityManager.persistAndFlush(
-            DocumentVersion(
-                documentId = document.id,
-                version = 1,
-                authorNavIdent = "abc",
-                json = "{}",
-                created = now,
-                modified = now,
+        val documentVersion =
+            testEntityManager.persistAndFlush(
+                DocumentVersion(
+                    documentId = document.id,
+                    version = 1,
+                    authorNavIdent = "abc",
+                    json = "{}",
+                    created = now,
+                    modified = now,
+                ),
             )
-        )
 
         testEntityManager.clear()
 
         val foundDocumentVersion = documentVersionRepository.findByDocumentId(documentId = documentVersion.documentId)
         assertThat(foundDocumentVersion.first()).isEqualTo(documentVersion)
 
-        val comment1Parent = testEntityManager.persistAndFlush(
-            Comment(
-                documentId = document.id,
-                text = "my comment 1",
-                authorName = "Kalle Anka",
-                authorIdent = "Z123456",
-                created = now.plusDays(1),
-                modified = now.plusDays(1)
+        val comment1Parent =
+            testEntityManager.persistAndFlush(
+                Comment(
+                    documentId = document.id,
+                    text = "my comment 1",
+                    authorName = "Kalle Anka",
+                    authorIdent = "Z123456",
+                    created = now.plusDays(1),
+                    modified = now.plusDays(1),
+                ),
             )
-        )
 
-        val comment2 = testEntityManager.persistAndFlush(
-            Comment(
-                documentId = document.id,
-                parentCommentId = comment1Parent.id,
-                text = "my sub comment 1",
-                authorName = "Kajsa Anka",
-                authorIdent = "Z654321",
-                created = now.plusDays(2),
-                modified = now.plusDays(2)
+        val comment2 =
+            testEntityManager.persistAndFlush(
+                Comment(
+                    documentId = document.id,
+                    parentCommentId = comment1Parent.id,
+                    text = "my sub comment 1",
+                    authorName = "Kajsa Anka",
+                    authorIdent = "Z654321",
+                    created = now.plusDays(2),
+                    modified = now.plusDays(2),
+                ),
             )
-        )
 
-        val comment3 = testEntityManager.persistAndFlush(
-            Comment(
-                documentId = document.id,
-                parentCommentId = comment1Parent.id,
-                text = "my sub comment 2",
-                authorName = "Kajsa Anka",
-                authorIdent = "Z654321",
-                created = now.plusDays(3),
-                modified = now.plusDays(3)
+        val comment3 =
+            testEntityManager.persistAndFlush(
+                Comment(
+                    documentId = document.id,
+                    parentCommentId = comment1Parent.id,
+                    text = "my sub comment 2",
+                    authorName = "Kajsa Anka",
+                    authorIdent = "Z654321",
+                    created = now.plusDays(3),
+                    modified = now.plusDays(3),
+                ),
             )
-        )
 
         testEntityManager.clear()
 
@@ -113,48 +118,52 @@ class RepositoryTest: PostgresIntegrationTestBase() {
     fun `child comments are removed with parent`() {
         val now = LocalDateTime.now()
 
-        val document = testEntityManager.persistAndFlush(
-            Document(
-                data = "{}",
-                created = now,
-                modified = now,
+        val document =
+            testEntityManager.persistAndFlush(
+                Document(
+                    data = "{}",
+                    created = now,
+                    modified = now,
+                ),
             )
-        )
 
-        val comment1Parent = testEntityManager.persistAndFlush(
-            Comment(
-                documentId = document.id,
-                text = "my comment 1",
-                authorName = "Kalle Anka",
-                authorIdent = "Z123456",
-                created = now.plusDays(1),
-                modified = now.plusDays(1)
+        val comment1Parent =
+            testEntityManager.persistAndFlush(
+                Comment(
+                    documentId = document.id,
+                    text = "my comment 1",
+                    authorName = "Kalle Anka",
+                    authorIdent = "Z123456",
+                    created = now.plusDays(1),
+                    modified = now.plusDays(1),
+                ),
             )
-        )
 
-        val comment2 = testEntityManager.persistAndFlush(
-            Comment(
-                documentId = document.id,
-                parentCommentId = comment1Parent.id,
-                text = "my sub comment 1",
-                authorName = "Kajsa Anka",
-                authorIdent = "Z654321",
-                created = now.plusDays(2),
-                modified = now.plusDays(2)
+        val comment2 =
+            testEntityManager.persistAndFlush(
+                Comment(
+                    documentId = document.id,
+                    parentCommentId = comment1Parent.id,
+                    text = "my sub comment 1",
+                    authorName = "Kajsa Anka",
+                    authorIdent = "Z654321",
+                    created = now.plusDays(2),
+                    modified = now.plusDays(2),
+                ),
             )
-        )
 
-        val comment3 = testEntityManager.persistAndFlush(
-            Comment(
-                documentId = document.id,
-                parentCommentId = comment1Parent.id,
-                text = "my sub comment 2",
-                authorName = "Kajsa Anka",
-                authorIdent = "Z654321",
-                created = now.plusDays(3),
-                modified = now.plusDays(3),
+        val comment3 =
+            testEntityManager.persistAndFlush(
+                Comment(
+                    documentId = document.id,
+                    parentCommentId = comment1Parent.id,
+                    text = "my sub comment 2",
+                    authorName = "Kajsa Anka",
+                    authorIdent = "Z654321",
+                    created = now.plusDays(3),
+                    modified = now.plusDays(3),
+                ),
             )
-        )
 
         testEntityManager.clear()
 
@@ -178,13 +187,14 @@ class RepositoryTest: PostgresIntegrationTestBase() {
     fun `add and delete document versions`() {
         val now = LocalDateTime.now()
 
-        val document = testEntityManager.persistAndFlush(
-            Document(
-                data = "{}",
-                created = now,
-                modified = now,
+        val document =
+            testEntityManager.persistAndFlush(
+                Document(
+                    data = "{}",
+                    created = now,
+                    modified = now,
+                ),
             )
-        )
 
         testEntityManager.persistAndFlush(
             DocumentVersion(
@@ -194,7 +204,7 @@ class RepositoryTest: PostgresIntegrationTestBase() {
                 json = "{}",
                 created = now,
                 modified = now,
-            )
+            ),
         )
 
         testEntityManager.persistAndFlush(
@@ -205,7 +215,7 @@ class RepositoryTest: PostgresIntegrationTestBase() {
                 json = "{}",
                 created = now,
                 modified = now,
-            )
+            ),
         )
 
         testEntityManager.clear()
@@ -225,21 +235,23 @@ class RepositoryTest: PostgresIntegrationTestBase() {
     fun `latest version number is recorded`() {
         val now = LocalDateTime.now()
 
-        val document1 = testEntityManager.persistAndFlush(
-            Document(
-                data = "{}",
-                created = now,
-                modified = now,
+        val document1 =
+            testEntityManager.persistAndFlush(
+                Document(
+                    data = "{}",
+                    created = now,
+                    modified = now,
+                ),
             )
-        )
 
-        val document2 = testEntityManager.persistAndFlush(
-            Document(
-                data = "{}",
-                created = now,
-                modified = now,
+        val document2 =
+            testEntityManager.persistAndFlush(
+                Document(
+                    data = "{}",
+                    created = now,
+                    modified = now,
+                ),
             )
-        )
 
         val numberOfDocumenVersionsToCreateDocument1 = 10
         val numberOfDocumenVersionsToCreateDocument2 = 15
@@ -253,7 +265,7 @@ class RepositoryTest: PostgresIntegrationTestBase() {
                     json = "{}",
                     created = now,
                     modified = now,
-                )
+                ),
             )
         }
 
@@ -266,7 +278,7 @@ class RepositoryTest: PostgresIntegrationTestBase() {
                     json = "{}",
                     created = now,
                     modified = now,
-                )
+                ),
             )
         }
 
@@ -278,5 +290,4 @@ class RepositoryTest: PostgresIntegrationTestBase() {
         assertThat(latestVersionNumberDocument1).isEqualTo(numberOfDocumenVersionsToCreateDocument1)
         assertThat(latestVersionNumberDocument2).isEqualTo(numberOfDocumenVersionsToCreateDocument2)
     }
-
 }

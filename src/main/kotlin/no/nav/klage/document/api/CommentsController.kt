@@ -12,8 +12,15 @@ import no.nav.klage.document.service.CommentService
 import no.nav.klage.document.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
-import org.springframework.web.bind.annotation.*
-import java.util.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @ProtectedWithClaims(issuer = ISSUER_AAD)
@@ -21,9 +28,8 @@ import java.util.*
 @RequestMapping("/documents/{documentId}/comments")
 class CommentsController(
     private val commentService: CommentService,
-    private val tokenValidationContextHolder: TokenValidationContextHolder
+    private val tokenValidationContextHolder: TokenValidationContextHolder,
 ) {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -31,12 +37,12 @@ class CommentsController(
 
     @Operation(
         summary = "Create comment for a given document",
-        description = "Create comment for a given document"
+        description = "Create comment for a given document",
     )
     @PostMapping
     fun createComment(
         @PathVariable("documentId") documentId: UUID,
-        @RequestBody commentInput: CommentInput
+        @RequestBody commentInput: CommentInput,
     ): CommentView {
         log("createComment called with id $documentId")
         return mapCommentToView(
@@ -44,18 +50,18 @@ class CommentsController(
                 documentId = documentId,
                 text = commentInput.text,
                 authorName = commentInput.author.name,
-                authorIdent = commentInput.author.ident
-            )
+                authorIdent = commentInput.author.ident,
+            ),
         )
     }
 
     @Operation(
         summary = "Get all comments for a given document",
-        description = "Get all comments for a given document"
+        description = "Get all comments for a given document",
     )
     @GetMapping
     fun getAllCommentsWithPossibleThreads(
-        @PathVariable("documentId") documentId: UUID
+        @PathVariable("documentId") documentId: UUID,
     ): List<CommentView> {
         log("getAllCommentsWithPossibleThreads called with id $documentId")
         return commentService.getComments(documentId).map { mapCommentToView(it) }
@@ -63,7 +69,7 @@ class CommentsController(
 
     @Operation(
         summary = "Reply to a given comment",
-        description = "Reply to a given comment"
+        description = "Reply to a given comment",
     )
     @PostMapping("/{commentId}/replies")
     fun replyToComment(
@@ -78,14 +84,14 @@ class CommentsController(
                 parentCommentId = commentId,
                 text = commentInput.text,
                 authorName = commentInput.author.name,
-                authorIdent = commentInput.author.ident
-            )
+                authorIdent = commentInput.author.ident,
+            ),
         )
     }
 
     @Operation(
         summary = "Modify a given comment",
-        description = "Modify a given comment"
+        description = "Modify a given comment",
     )
     @PatchMapping("/{commentId}")
     fun modifyComment(
@@ -98,19 +104,19 @@ class CommentsController(
             commentService.setCommentText(
                 commentId = commentId,
                 text = modifyCommentInput.text,
-                loggedInIdent = getIdent()!!
-            )
+                loggedInIdent = getIdent()!!,
+            ),
         )
     }
 
     @Operation(
         summary = "Get a given comment",
-        description = "Get a given comment"
+        description = "Get a given comment",
     )
     @GetMapping("/{commentId}")
     fun getCommentWithPossibleThread(
         @PathVariable("documentId") documentId: UUID,
-        @PathVariable("commentId") commentId: UUID
+        @PathVariable("commentId") commentId: UUID,
     ): CommentView {
         log("getCommentWithPossibleThread called with id $documentId and commentId $commentId")
         return mapCommentToView(commentService.getComment(commentId = commentId))
@@ -119,12 +125,12 @@ class CommentsController(
     @Deprecated("Use POST /{commentId}/delete")
     @Operation(
         summary = "Delete a given comment (includes possible thread)",
-        description = "Delete a given comment (includes possible thread)"
+        description = "Delete a given comment (includes possible thread)",
     )
     @DeleteMapping("/{commentId}")
     fun deleteCommentWithPossibleThreadDeprecated(
         @PathVariable("documentId") documentId: UUID,
-        @PathVariable("commentId") commentId: UUID
+        @PathVariable("commentId") commentId: UUID,
     ) {
         log("deleteCommentWithPossibleThreadDeprecated called with id $documentId and commentId $commentId")
         commentService.deleteComment(commentId = commentId, loggedInIdent = getIdent()!!, behandlingTildeltIdent = null)
@@ -132,26 +138,33 @@ class CommentsController(
 
     @Operation(
         summary = "Delete a given comment (includes possible thread)",
-        description = "Delete a given comment (includes possible thread)"
+        description = "Delete a given comment (includes possible thread)",
     )
     @PostMapping("/{commentId}/delete")
     fun deleteCommentWithPossibleThread(
         @PathVariable("documentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID,
-        @RequestBody deleteCommentInput: DeleteCommentInput
+        @RequestBody deleteCommentInput: DeleteCommentInput,
     ): CommentView {
         log("deleteCommentWithPossibleThread called with id $documentId and commentId $commentId")
-        return mapCommentToView(commentService.deleteComment(commentId = commentId, loggedInIdent = getIdent()!!, behandlingTildeltIdent = deleteCommentInput.behandlingTildeltIdent))
+        return mapCommentToView(
+            commentService.deleteComment(
+                commentId = commentId,
+                loggedInIdent = getIdent()!!,
+                behandlingTildeltIdent = deleteCommentInput.behandlingTildeltIdent,
+            ),
+        )
     }
 
     private fun mapCommentToView(comment: Comment): CommentView =
         CommentView(
             id = comment.id,
             text = comment.text,
-            author = CommentView.Author(
-                name = comment.authorName,
-                ident = comment.authorIdent
-            ),
+            author =
+                CommentView.Author(
+                    name = comment.authorName,
+                    ident = comment.authorIdent,
+                ),
             comments = comment.comments.map { mapCommentToView(it) },
             created = comment.created,
             modified = comment.modified,
@@ -163,7 +176,10 @@ class CommentsController(
     }
 
     fun getIdent(): String? =
-        tokenValidationContextHolder.getTokenValidationContext().getJwtToken(ISSUER_AAD)
-            ?.jwtTokenClaims?.get("NAVident")?.toString()
-
+        tokenValidationContextHolder
+            .getTokenValidationContext()
+            .getJwtToken(ISSUER_AAD)
+            ?.jwtTokenClaims
+            ?.get("NAVident")
+            ?.toString()
 }

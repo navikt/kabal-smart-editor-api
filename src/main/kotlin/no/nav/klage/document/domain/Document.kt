@@ -5,7 +5,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Entity
 @Table(name = "document", schema = "klage")
@@ -28,12 +28,7 @@ class Document(
         return id == other.id
     }
 
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
+    override fun hashCode(): Int = id.hashCode()
 
-    override fun toString(): String {
-        return "Document(id=$id, created=$created, modified=$modified)"
-    }
-
+    override fun toString(): String = "Document(id=$id, created=$created, modified=$modified)"
 }

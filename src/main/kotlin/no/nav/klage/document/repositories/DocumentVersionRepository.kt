@@ -6,10 +6,9 @@ import no.nav.klage.document.domain.ShortDocumentVersion
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
-import java.util.*
+import java.util.UUID
 
 interface DocumentVersionRepository : JpaRepository<DocumentVersion, DocumentVersionId> {
-
     fun findByDocumentId(documentId: UUID): List<DocumentVersion>
 
     @Query(
@@ -18,7 +17,7 @@ interface DocumentVersionRepository : JpaRepository<DocumentVersion, DocumentVer
         FROM DocumentVersion
         WHERE documentId = :documentId
         ORDER BY version
-        """
+        """,
     )
     fun findVersionsByDocumentId(documentId: UUID): List<ShortDocumentVersion>
 

@@ -2,10 +2,10 @@ package no.nav.klage.document.domain
 
 import jakarta.persistence.Embeddable
 import java.io.Serializable
-import java.util.*
+import java.util.UUID
 
 @Embeddable
 data class DocumentVersionId(
     val documentId: UUID,
     val version: Int = 1,
-): Serializable
+) : Serializable
