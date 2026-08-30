@@ -10,8 +10,15 @@ import no.nav.klage.document.service.DocumentService
 import no.nav.klage.document.util.TokenUtil
 import no.nav.klage.document.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.web.bind.annotation.*
-import java.util.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @ProtectedWithClaims(issuer = ISSUER_AAD)
@@ -21,7 +28,6 @@ class DocumentController(
     private val documentService: DocumentService,
     private val tokenUtil: TokenUtil,
 ) {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -29,7 +35,7 @@ class DocumentController(
 
     @Operation(
         summary = "Create document",
-        description = "Create document"
+        description = "Create document",
     )
     @PostMapping("")
     fun createDocument(
@@ -41,7 +47,7 @@ class DocumentController(
 
     @Operation(
         summary = "Update document",
-        description = "Update document"
+        description = "Update document",
     )
     @PutMapping("/{documentId}")
     fun updateDocument(
@@ -57,7 +63,6 @@ class DocumentController(
                 data = input.data,
                 currentVersion = input.currentVersion,
             )
-
         } catch (e: Exception) {
             logger.warn("Failed to update document $documentId. Trying one more time.", e)
             documentService.updateDocument(
@@ -71,7 +76,7 @@ class DocumentController(
 
     @Operation(
         summary = "Get document",
-        description = "Get document"
+        description = "Get document",
     )
     @GetMapping("/{documentId}", "/{documentId}/versions/{version}")
     fun getDocument(
@@ -84,20 +89,24 @@ class DocumentController(
 
     @Operation(
         summary = "Delete document",
-        description = "Delete document"
+        description = "Delete document",
     )
     @DeleteMapping("/{documentId}")
-    fun deleteDocument(@PathVariable("documentId") documentId: UUID) {
+    fun deleteDocument(
+        @PathVariable("documentId") documentId: UUID,
+    ) {
         log("deleteDocument called with id $documentId")
         documentService.deleteDocument(documentId)
     }
 
     @Operation(
         summary = "Get document versions",
-        description = "Get document versions"
+        description = "Get document versions",
     )
     @GetMapping("/{documentId}/versions")
-    fun getDocumentVersions(@PathVariable("documentId") documentId: UUID): List<DocumentVersionView> {
+    fun getDocumentVersions(
+        @PathVariable("documentId") documentId: UUID,
+    ): List<DocumentVersionView> {
         log("getDocumentVersions called with id $documentId")
         return documentService.getDocumentVersions(documentId = documentId)
     }
@@ -105,5 +114,4 @@ class DocumentController(
     private fun log(message: String) {
         logger.debug("{}. On-behalf-of: {}", message, tokenUtil.getIdentNullable())
     }
-
 }

@@ -1,11 +1,19 @@
 package no.nav.klage.document.domain
 
-import jakarta.persistence.*
+import jakarta.persistence.CascadeType
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.OneToMany
+import jakarta.persistence.OrderBy
+import jakarta.persistence.Table
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Entity
 @Table(name = "comment", schema = "klage")
@@ -31,7 +39,7 @@ class Comment(
     @Column(name = "created")
     val created: LocalDateTime,
     @Column(name = "modified")
-    var modified: LocalDateTime
+    var modified: LocalDateTime,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -44,12 +52,7 @@ class Comment(
         return true
     }
 
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
+    override fun hashCode(): Int = id.hashCode()
 
-    override fun toString(): String {
-        return "Comment(id=$id, documentId=$documentId, text='$text', created=$created, modified=$modified)"
-    }
-
+    override fun toString(): String = "Comment(id=$id, documentId=$documentId, text='$text', created=$created, modified=$modified)"
 }

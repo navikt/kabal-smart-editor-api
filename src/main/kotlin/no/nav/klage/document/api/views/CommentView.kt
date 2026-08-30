@@ -1,7 +1,7 @@
 package no.nav.klage.document.api.views
 
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class CommentView(
     val id: UUID,
@@ -14,6 +14,6 @@ data class CommentView(
 ) {
     data class Author(
         val name: String,
-        val ident: String
+        val ident: String,
     )
 }

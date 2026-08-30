@@ -1,7 +1,7 @@
 package no.nav.klage.document.api.views
 
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class DocumentView(
     val json: String,
@@ -11,7 +11,7 @@ data class DocumentView(
     val version: Int,
     val authorNavIdent: String?,
     val created: LocalDateTime,
-    val modified: LocalDateTime
+    val modified: LocalDateTime,
 )
 
 data class DocumentVersionView(

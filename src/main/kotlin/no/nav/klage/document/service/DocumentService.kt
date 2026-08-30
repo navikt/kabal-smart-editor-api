@@ -15,7 +15,7 @@ import no.nav.klage.document.util.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Service
 @Transactional
@@ -26,39 +26,48 @@ class DocumentService(
     private val latestDocumentRepository: LatestDocumentVersionRepository,
     private val tokenUtil: TokenUtil,
 ) {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun createDocument(json: String, data: String?): DocumentView {
+    fun createDocument(
+        json: String,
+        data: String?,
+    ): DocumentView {
         val now = LocalDateTime.now()
 
-        val document = documentRepository.save(
-            Document(
-                data = data,
-                created = now,
-                modified = now,
-            )
-        )
-
-        return mapToDocumentView(
-            documentVersionRepository.save(
-                DocumentVersion(
-                    documentId = document.id,
-                    version = 1,
-                    json = json,
-                    authorNavIdent = tokenUtil.getIdent(),
+        val document =
+            documentRepository.save(
+                Document(
+                    data = data,
                     created = now,
                     modified = now,
-                )
-            ),
-            document = document
+                ),
+            )
+
+        return mapToDocumentView(
+            documentVersion =
+                documentVersionRepository.save(
+                    DocumentVersion(
+                        documentId = document.id,
+                        version = 1,
+                        json = json,
+                        authorNavIdent = tokenUtil.getIdent(),
+                        created = now,
+                        modified = now,
+                    ),
+                ),
+            document = document,
         )
     }
 
-    fun updateDocument(documentId: UUID, json: String, data: String?, currentVersion: Int?): DocumentView {
+    fun updateDocument(
+        documentId: UUID,
+        json: String,
+        data: String?,
+        currentVersion: Int?,
+    ): DocumentView {
         val now = LocalDateTime.now()
         val latestVersionNumber = latestDocumentRepository.findById(documentId).get().currentVersion
 
@@ -81,42 +90,49 @@ class DocumentService(
         }
 
         val documentVersion =
-            documentVersionRepository.findById(
-                DocumentVersionId(
-                    documentId = documentId,
-                    version = latestVersionNumber
-                )
-            ).get()
+            documentVersionRepository
+                .findById(
+                    DocumentVersionId(
+                        documentId = documentId,
+                        version = latestVersionNumber,
+                    ),
+                ).get()
 
         val document = documentRepository.findById(documentId).get()
         document.data = data
         document.modified = now
 
         return mapToDocumentView(
-            documentVersion = documentVersionRepository.save(
-                DocumentVersion(
-                    documentId = documentVersion.documentId,
-                    version = latestVersionNumber + 1,
-                    json = json,
-                    created = now,
-                    modified = now,
-                    authorNavIdent = tokenUtil.getIdent()
-                )
-            ),
-            document = document
+            documentVersion =
+                documentVersionRepository.save(
+                    DocumentVersion(
+                        documentId = documentVersion.documentId,
+                        version = latestVersionNumber + 1,
+                        json = json,
+                        created = now,
+                        modified = now,
+                        authorNavIdent = tokenUtil.getIdent(),
+                    ),
+                ),
+            document = document,
         )
     }
 
-    fun getDocument(documentId: UUID, version: Int?): DocumentView {
+    fun getDocument(
+        documentId: UUID,
+        version: Int?,
+    ): DocumentView {
         val versionToUse = version ?: latestDocumentRepository.findById(documentId).get().currentVersion
         return mapToDocumentView(
-            documentVersion = documentVersionRepository.findById(
-                DocumentVersionId(
-                    documentId = documentId,
-                    version = versionToUse
-                )
-            ).get(),
-            document = documentRepository.findById(documentId).get()
+            documentVersion =
+                documentVersionRepository
+                    .findById(
+                        DocumentVersionId(
+                            documentId = documentId,
+                            version = versionToUse,
+                        ),
+                    ).get(),
+            document = documentRepository.findById(documentId).get(),
         )
     }
 
@@ -127,12 +143,15 @@ class DocumentService(
         documentRepository.deleteByDocumentId(documentId)
     }
 
-    fun getDocumentVersions(documentId: UUID): List<DocumentVersionView> {
-        return documentVersionRepository.findVersionsByDocumentId(documentId = documentId)
+    fun getDocumentVersions(documentId: UUID): List<DocumentVersionView> =
+        documentVersionRepository
+            .findVersionsByDocumentId(documentId = documentId)
             .map { mapToDocumentVersionView(it) }
-    }
 
-    private fun mapToDocumentView(documentVersion: DocumentVersion, document: Document): DocumentView =
+    private fun mapToDocumentView(
+        documentVersion: DocumentVersion,
+        document: Document,
+    ): DocumentView =
         DocumentView(
             id = documentVersion.documentId,
             documentId = documentVersion.documentId,
@@ -141,7 +160,7 @@ class DocumentService(
             data = document.data,
             authorNavIdent = documentVersion.authorNavIdent,
             created = documentVersion.created,
-            modified = documentVersion.modified
+            modified = documentVersion.modified,
         )
 
     private fun mapToDocumentVersionView(documentVersion: ShortDocumentVersion): DocumentVersionView =
@@ -150,7 +169,6 @@ class DocumentService(
             version = documentVersion.version,
             authorNavIdent = documentVersion.authorNavIdent,
             created = documentVersion.created,
-            modified = documentVersion.modified
+            modified = documentVersion.modified,
         )
-
 }

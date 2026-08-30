@@ -3,7 +3,7 @@ package no.nav.klage.document.domain
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import java.util.*
+import java.util.UUID
 
 @Entity
 @Table(name = "latest_document_version", schema = "klage")
@@ -21,12 +21,7 @@ class LatestDocumentVersion(
         return documentId == other.documentId
     }
 
-    override fun hashCode(): Int {
-        return documentId.hashCode()
-    }
+    override fun hashCode(): Int = documentId.hashCode()
 
-    override fun toString(): String {
-        return "Document(id=$documentId, currentVersion=$currentVersion)"
-    }
-
+    override fun toString(): String = "Document(id=$documentId, currentVersion=$currentVersion)"
 }

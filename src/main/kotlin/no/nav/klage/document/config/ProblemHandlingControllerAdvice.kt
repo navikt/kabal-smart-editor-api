@@ -12,37 +12,30 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @RestControllerAdvice
 class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
-
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val ourLogger = getLogger(javaClass.enclosingClass)
     }
 
     @ExceptionHandler
-    fun handleEntityNotFound(
-        ex: JpaObjectRetrievalFailureException,
-    ): ProblemDetail =
-        create(HttpStatus.NOT_FOUND, ex)
+    fun handleEntityNotFound(ex: JpaObjectRetrievalFailureException): ProblemDetail = create(httpStatus = HttpStatus.NOT_FOUND, ex = ex)
 
     @ExceptionHandler
-    fun handleEntityNotFound(
-        ex: NoSuchElementException,
-    ): ProblemDetail =
-        create(HttpStatus.NOT_FOUND, ex)
+    fun handleEntityNotFound(ex: NoSuchElementException): ProblemDetail = create(httpStatus = HttpStatus.NOT_FOUND, ex = ex)
 
     @ExceptionHandler
-    fun handleMissingAccess(
-        ex: MissingAccessException,
-    ): ProblemDetail =
-        create(HttpStatus.FORBIDDEN, ex)
+    fun handleMissingAccess(ex: MissingAccessException): ProblemDetail = create(httpStatus = HttpStatus.FORBIDDEN, ex = ex)
 
-    private fun create(httpStatus: HttpStatus, ex: Exception): ProblemDetail {
+    private fun create(
+        httpStatus: HttpStatus,
+        ex: Exception,
+    ): ProblemDetail {
         val errorMessage = ex.message ?: "No error message available"
 
         logError(
             httpStatus = httpStatus,
             errorMessage = errorMessage,
-            exception = ex
+            exception = ex,
         )
 
         return ProblemDetail.forStatusAndDetail(httpStatus, errorMessage).apply {
@@ -50,7 +43,11 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
         }
     }
 
-    private fun logError(httpStatus: HttpStatus, errorMessage: String, exception: Exception) {
+    private fun logError(
+        httpStatus: HttpStatus,
+        errorMessage: String,
+        exception: Exception,
+    ) {
         when {
             httpStatus.is5xxServerError -> {
                 ourLogger.error("Exception thrown to client: ${httpStatus.reasonPhrase}, $errorMessage", exception)
