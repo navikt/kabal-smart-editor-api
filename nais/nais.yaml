@@ -17,7 +17,7 @@ spec:
   gcp:
     sqlInstances:
       - type: {{db_type}}
-        name: kabal-smart-editor-api-priv
+        name: kabal-smart-editor-api
         maintenance:
           day: 1
           hour: 3
