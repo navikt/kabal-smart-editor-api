@@ -17,7 +17,7 @@ spec:
   gcp:
     sqlInstances:
       - type: {{db_type}}
-        name: kabal-smart-editor-api
+        name: {{db_instance_name}}
         maintenance:
           day: 1
           hour: 3
@@ -29,7 +29,7 @@ spec:
         autoBackupHour: 2
         cascadingDelete: false
         databases:
-          - name: kabal-smart-editor-api
+          - name: {{db_name}}
   port: 7095
   startup:
     failureThreshold: 7
