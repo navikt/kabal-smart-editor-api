@@ -8,10 +8,11 @@ val mockkVersion = "1.14.11"
 val logstashVersion = "9.0"
 val testContainersVersion = "2.0.5"
 val springDocVersion = "3.1.1"
-val tokenValidationVersion = "5.0.30"
+val tokenValidationVersion = "6.0.14"
 
 repositories {
     mavenCentral()
+    maven("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
 }
 
 plugins {
