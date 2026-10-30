@@ -21,6 +21,9 @@ spring:
   web:
     resources:
       add-mappings: false
+    error:
+      include-message: never
+      include-stacktrace: never
   jpa:
     open-in-view: false
 
@@ -34,7 +37,7 @@ server:
 management:
   endpoint:
     health:
-      show-details: always
+      show-details: never
   endpoints.web:
     exposure:
       include: info, health, metrics, prometheus
@@ -48,9 +51,3 @@ management:
         enabled: true
   tracing:
     enabled: false
-
-no.nav.security.jwt:
-  issuer:
-    aad:
-      discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
-      accepted_audience: ${AZURE_APP_CLIENT_ID}
