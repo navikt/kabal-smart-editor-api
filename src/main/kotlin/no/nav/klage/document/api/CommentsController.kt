@@ -6,12 +6,10 @@ import no.nav.klage.document.api.views.CommentInput
 import no.nav.klage.document.api.views.CommentView
 import no.nav.klage.document.api.views.DeleteCommentInput
 import no.nav.klage.document.api.views.ModifyCommentInput
-import no.nav.klage.document.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.document.domain.Comment
 import no.nav.klage.document.service.CommentService
+import no.nav.klage.document.util.TokenUtil
 import no.nav.klage.document.util.getLogger
-import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -23,12 +21,11 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
 @RestController
-@ProtectedWithClaims(issuer = ISSUER_AAD)
 @Tag(name = "kabal-smart-editor-api")
 @RequestMapping("/documents/{documentId}/comments")
 class CommentsController(
     private val commentService: CommentService,
-    private val tokenValidationContextHolder: TokenValidationContextHolder,
+    private val tokenUtil: TokenUtil,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -104,7 +101,7 @@ class CommentsController(
             commentService.setCommentText(
                 commentId = commentId,
                 text = modifyCommentInput.text,
-                loggedInIdent = getIdent()!!,
+                loggedInIdent = tokenUtil.getIdent(),
             ),
         )
     }
@@ -133,7 +130,7 @@ class CommentsController(
         @PathVariable("commentId") commentId: UUID,
     ) {
         log("deleteCommentWithPossibleThreadDeprecated called with id $documentId and commentId $commentId")
-        commentService.deleteComment(commentId = commentId, loggedInIdent = getIdent()!!, behandlingTildeltIdent = null)
+        commentService.deleteComment(commentId = commentId, loggedInIdent = tokenUtil.getIdent(), behandlingTildeltIdent = null)
     }
 
     @Operation(
@@ -150,7 +147,7 @@ class CommentsController(
         return mapCommentToView(
             commentService.deleteComment(
                 commentId = commentId,
-                loggedInIdent = getIdent()!!,
+                loggedInIdent = tokenUtil.getIdent(),
                 behandlingTildeltIdent = deleteCommentInput.behandlingTildeltIdent,
             ),
         )
@@ -172,14 +169,6 @@ class CommentsController(
         )
 
     private fun log(message: String) {
-        logger.debug("{}. On-behalf-of: {}", message, getIdent())
+        logger.debug("{}. On-behalf-of: {}", message, tokenUtil.getIdentNullable())
     }
-
-    fun getIdent(): String? =
-        tokenValidationContextHolder
-            .getTokenValidationContext()
-            .getJwtToken(ISSUER_AAD)
-            ?.jwtTokenClaims
-            ?.get("NAVident")
-            ?.toString()
 }
