@@ -5,11 +5,9 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.document.api.views.DocumentUpdateInput
 import no.nav.klage.document.api.views.DocumentVersionView
 import no.nav.klage.document.api.views.DocumentView
-import no.nav.klage.document.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.document.service.DocumentService
 import no.nav.klage.document.util.TokenUtil
 import no.nav.klage.document.util.getLogger
-import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -21,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
 @RestController
-@ProtectedWithClaims(issuer = ISSUER_AAD)
 @Tag(name = "kabal-smart-editor-api")
 @RequestMapping("/documents")
 class DocumentController(
