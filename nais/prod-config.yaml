@@ -14,5 +14,5 @@ replicasMin: 2
 replicasMax: 4
 
 envs:
-  - name: JAVA_OPTS
-    value: "-Xms256m -Xmx2048m"
+  - name: JAVA_TOOL_OPTIONS
+    value: "-Xms256m -Xmx2048m --enable-native-access=ALL-UNNAMED"
